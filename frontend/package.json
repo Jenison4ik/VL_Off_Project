@@ -17,6 +17,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@yandex/ymaps3-types": "^1.0.17734864",
+    "msw": "^2.11.6",
     "prettier": "^3.6.2",
     "typescript": "^5"
   }

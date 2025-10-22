@@ -18,6 +18,12 @@ export default async function Home() {
         reprehenderit corrupti quidem laborum necessitatibus non voluptas
         nostrum, quisquam ab?
       </p>
+      <MockInitializer>
+        <Users />
+      </MockInitializer>
+      <MockInitializer>
+        <Users />
+      </MockInitializer>
     </>
   );
 }

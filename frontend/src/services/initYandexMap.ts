@@ -29,5 +29,5 @@ export async function initReactify() {
   // Привязка React и ReactDOM
   const reactify = ymaps3React.reactify.bindTo(React, ReactDOM);
 
-  return reactify.module(ymaps3);
+  return reactify;
 }

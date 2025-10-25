@@ -1,4 +1,4 @@
-# Docker инструкции для Next.js проекта
+# Docker инструкции для Frontend части проекта
 
 ## Сборка и запуск
 
@@ -10,19 +10,6 @@ docker-compose up --build
 
 # Запуск в фоновом режиме
 docker-compose up -d --build
-```
-
-### Вариант 2: Использование Docker напрямую
-
-```bash
-# Переход в папку frontend
-cd frontend
-
-# Сборка образа
-docker build -t vl-off-frontend .
-
-# Запуск контейнера
-docker run -p 3000:3000 vl-off-frontend
 ```
 
 ## Доступ к приложению

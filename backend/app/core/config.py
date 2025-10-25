@@ -4,7 +4,7 @@ from pydantic import BaseModel, PostgresDsn
 
 class ApiV1Prefix(BaseModel):
     prefix: str = '/v1'
-
+    blackouts: str = '/blackouts'
 
 class ApiPrefix(BaseModel):
     prefix: str = '/api'

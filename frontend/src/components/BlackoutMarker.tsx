@@ -1,32 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
-export default function BlackoutMarker({ data, Marker }: any) {
-  const [isOpen, setIsOpen] = useState(false);
+type Evt = { type: "closeAll" } | { type: "closeExcept"; id: string };
 
-  const togglePopup = (e: MouseEvent) => {
-    console.log(e);
-    e.stopPropagation(); // предотвратить клик по карте
-    setIsOpen((prev) => !prev);
+export default function BlackoutMarker({
+  id,
+  data,
+  Marker,
+  emitter,
+  recordInteraction,
+}: {
+  id: string;
+  data: any;
+  Marker: any;
+  emitter: {
+    subscribe: (fn: (e: Evt) => void) => () => void;
+    publish: (e: Evt) => void;
   };
+  recordInteraction: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const unsub = emitter.subscribe((e) => {
+      if (e.type === "closeAll") {
+        setOpen(false);
+      } else if (e.type === "closeExcept") {
+        if (e.id !== id) setOpen(false);
+      }
+    });
+    return unsub;
+  }, [emitter, id]);
+
+  const onMarkerClick = useCallback(
+    (e?: any) => {
+      // открываем себя и просим закрыть остальные
+      setOpen(true);
+      emitter.publish({ type: "closeExcept", id });
+      recordInteraction(id);
+      // при необходимости остановите всплытие ymaps-события, если доступно:
+      try {
+        e?.originalEvent?.stopPropagation?.();
+      } catch {}
+    },
+    [emitter, id, recordInteraction]
+  );
   return (
     <Marker
-      onClick={togglePopup}
+      // style={{
+      //   boxShadow: "none",
+      //   outline: "none",
+      //   border:
+      // }}
+      onClick={onMarkerClick}
       coordinates={[data.coordinates[1], data.coordinates[0]]}
-      size="small"
+      size="micro"
       color={{
-        day: `${data.type === "electricity" ? "#d33123ff" : "#353ad4ff"}`,
+        day: `${data.type === "electricity" ? "#f17126ff" : "#2696f1ff"}`,
         night: "#00ff00",
       }}
       popup={{
-        show: isOpen,
+        show: open,
         content: () => (
           <div
             style={{
               padding: "6px 10px",
               background: "#fff",
-              borderRadius: 8,
               //   boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
               fontSize: 14,
             }}

@@ -4,64 +4,116 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { initReactify } from "../services/initYandexMap";
 import type { YMapLocationRequest } from "ymaps3";
 import style from "../app/YMap.module.css";
-import BlackoutMarker from "@/components/BlackoutMarker"; // 👈 отдельный компонент маркера
+import BlackoutMarker from "@/components/BlackoutMarker";
+import { initMocks } from "@/server/initMocks";
 
+// === Типы ===
 type Blackout = {
   coordinates: [number, number];
   type: string;
   description: string;
 };
 
+type Evt = { type: "closeAll" } | { type: "closeExcept"; id: string };
+
+// === Утилита для событий ===
+function createEmitter() {
+  const subs = new Set<(e: Evt) => void>();
+
+  return {
+    subscribe(fn: (e: Evt) => void) {
+      subs.add(fn);
+      return () => subs.delete(fn);
+    },
+    publish(e: Evt) {
+      subs.forEach((fn) => {
+        try {
+          fn(e);
+        } catch (err) {
+          console.error("Emitter handler error:", err);
+        }
+      });
+    },
+  };
+}
+
+// === Основной компонент карты ===
 export default function YandexMap() {
+  initMocks();
+
+  // --- refs и состояния ---
   const mapRef = useRef<any>(null);
-  const [components, setComponents] = useState<any>(null);
+  const emitterRef = useRef(createEmitter());
+  const lastInteractionRef = useRef<{
+    type: "marker" | "map" | null;
+    ts: number;
+    id?: string;
+  }>({
+    type: null,
+    ts: 0,
+  });
+
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [Marker, setMarker] = useState<any>(null);
+  const [mapComponents, setMapComponents] = useState<any>(null);
+  const [markerComponent, setMarkerComponent] = useState<any>(null);
+  const [zoomControl, setZoomControl] = useState<any>(null);
   const [blackouts, setBlackouts] = useState<Blackout[]>([]);
 
   const LOCATION: YMapLocationRequest = {
     center: [131.884293, 43.119515],
     zoom: 13,
   };
-  function handleMapClick(e: Event) {
-    console.log(e.target);
-  }
-  // === Инициализация карты ===
+
+  // === Хелпер для записи интеракций ===
+  const recordInteraction = useCallback(
+    (type: "marker" | "map", id?: string) => {
+      lastInteractionRef.current = { type, ts: Date.now(), id };
+    },
+    []
+  );
+
+  // === Инициализация карты и UI-модулей ===
   useEffect(() => {
-    let cleanup: (() => void) | undefined;
     let mounted = true;
+    let cleanup: (() => void) | undefined;
 
     (async () => {
       try {
         const reactify = await initReactify();
         if (!mounted) return;
 
-        const mapComponents = reactify.module(window.ymaps3);
-        setComponents(mapComponents);
+        const components = reactify.module(window.ymaps3);
+        setMapComponents(components);
 
+        // Подключаем тему UI
         window.ymaps3.import.registerCdn(
           "https://cdn.jsdelivr.net/npm/{package}",
           "@yandex/ymaps3-default-ui-theme@latest"
         );
-
         const themeModule = await window.ymaps3.import(
           "@yandex/ymaps3-default-ui-theme"
         );
-        const { YMapDefaultMarker } = reactify.module(themeModule);
-        setMarker(() => YMapDefaultMarker);
 
-        const onFullscreenChange = () => {
+        const { YMapDefaultMarker, YMapZoomControl } =
+          reactify.module(themeModule);
+        setMarkerComponent(() => YMapDefaultMarker);
+        setZoomControl(() => YMapZoomControl);
+
+        // Слушатель fullscreen
+        const handleFullscreenChange = () => {
           setIsFullscreen(Boolean(document.fullscreenElement));
           mapRef.current?.container?.fitToViewport?.();
         };
 
-        document.addEventListener("fullscreenchange", onFullscreenChange);
+        document.addEventListener("fullscreenchange", handleFullscreenChange);
         cleanup = () =>
-          document.removeEventListener("fullscreenchange", onFullscreenChange);
+          document.removeEventListener(
+            "fullscreenchange",
+            handleFullscreenChange
+          );
       } catch (err: any) {
-        if (!mounted) return;
-        setError(err.message || "Ошибка во время загрузки карты");
+        if (mounted) setError(err.message || "Ошибка во время загрузки карты");
       }
     })();
 
@@ -71,12 +123,13 @@ export default function YandexMap() {
     };
   }, []);
 
-  // === Загрузка данных ===
+  // === Загрузка данных точек ===
   useEffect(() => {
     (async () => {
       try {
         const res = await fetch("/api/blackouts");
         if (!res.ok) throw new Error("Ошибка загрузки данных");
+
         const data = await res.json();
         setBlackouts(data);
       } catch (err: any) {
@@ -87,8 +140,9 @@ export default function YandexMap() {
 
   // === Переключение fullscreen ===
   const toggleFullscreen = useCallback(() => {
+    if (!mapRef.current?.container) return;
+
     try {
-      if (!mapRef.current?.container) return;
       if (isFullscreen) document.exitFullscreen();
       else mapRef.current.container.requestFullscreen();
     } catch (err: any) {
@@ -96,7 +150,26 @@ export default function YandexMap() {
     }
   }, [isFullscreen]);
 
-  if (error)
+  // === Обработка клика по карте ===
+  const onMapClick = useCallback(
+    (e: Event) => {
+      const last = lastInteractionRef.current;
+      const now = Date.now();
+
+      // Если только что был клик по маркеру — игнорируем
+      if (last.type === "marker" && now - last.ts < 100) {
+        recordInteraction("map");
+        return;
+      }
+
+      emitterRef.current.publish({ type: "closeAll" });
+      recordInteraction("map");
+    },
+    [recordInteraction]
+  );
+
+  // === Обработка ошибок и состояния ===
+  if (error) {
     return (
       <div
         className={style.map}
@@ -105,9 +178,13 @@ export default function YandexMap() {
         <p style={{ color: "red" }}>{error}</p>
       </div>
     );
+  }
 
-  if (!components || !Marker) return <div>Загрузка карты...</div>;
+  if (!mapComponents || !markerComponent || !zoomControl) {
+    return <div>Загрузка карты...</div>;
+  }
 
+  // === Деструктурируем компоненты карты ===
   const {
     YMap,
     YMapDefaultSchemeLayer,
@@ -115,8 +192,11 @@ export default function YandexMap() {
     YMapControl,
     YMapDefaultFeaturesLayer,
     YMapListener,
-  } = components;
+  } = mapComponents;
 
+  const YMapZoomControl = zoomControl;
+
+  // === Рендер карты ===
   return (
     <div
       className={style.map}
@@ -129,24 +209,33 @@ export default function YandexMap() {
         zIndex: isFullscreen ? 9999 : 1,
       }}
     >
-      <YMap
-        location={LOCATION}
-        zoomRange={{ min: 12, max: 20 }}
-        ref={mapRef}
-        onActionStart
-      >
-        <YMapDefaultSchemeLayer
-          onClick={(e: Event) => {
-            console.log(e.target);
-          }}
-        />
+      <YMap location={LOCATION} zoomRange={{ min: 12, max: 20 }} ref={mapRef}>
+        <YMapDefaultSchemeLayer />
         <YMapDefaultFeaturesLayer />
 
-        {/* ✅ Маркеры теперь рендерятся отдельно, без влияния на карту */}
-        {blackouts.map((b, i) => (
-          <BlackoutMarker key={i} data={b} Marker={Marker} />
-        ))}
+        {/* --- Маркеры --- */}
+        {blackouts.map((b, i) => {
+          try {
+            const id = `${b.coordinates[0]}_${b.coordinates[1]}_${i}`;
+            return (
+              <BlackoutMarker
+                key={id}
+                id={id}
+                data={b}
+                Marker={markerComponent}
+                emitter={emitterRef.current}
+                recordInteraction={(id: string) =>
+                  recordInteraction("marker", id)
+                }
+              />
+            );
+          } catch (error) {
+            console.error("Error rendering blackout marker:", error);
+            return null;
+          }
+        })}
 
+        {/* --- Кнопки управления --- */}
         <YMapControls position="top right">
           <YMapControl>
             <button
@@ -159,6 +248,13 @@ export default function YandexMap() {
             </button>
           </YMapControl>
         </YMapControls>
+
+        <YMapControls position="left">
+          <YMapZoomControl />
+        </YMapControls>
+
+        {/* --- Обработчик кликов по карте --- */}
+        <YMapListener onClick={onMapClick} />
       </YMap>
     </div>
   );

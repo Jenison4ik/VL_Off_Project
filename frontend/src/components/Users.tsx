@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import getUsers from "@/services/getUsers";
-import { MockInitializer } from "./MockInitializer";
+import { initMocks } from "@/server/initMocks";
 export default function Users() {
+  initMocks();
   const [users, setUsers] = useState<any[]>([]);
   useEffect(() => {
     (async () => {

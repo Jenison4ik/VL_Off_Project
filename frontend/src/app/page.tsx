@@ -3,10 +3,10 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import YMap from "../components/YMap";
 import Users from "../components/Users";
-import { MockInitializer } from "../components/MockInitializer";
 import { server } from "@/mocks/node";
+import { MockInitializer } from "@/components/MockInitializer";
+
 export default async function Home() {
-  server.listen();
   return (
     <>
       <h1>Привет</h1>

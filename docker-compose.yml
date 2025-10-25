@@ -5,10 +5,13 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
+    container_name: next_frontend
     environment:
       - NODE_ENV=production
+    expose:
+      - "3000" # доступен только внутри сети Docker
+    networks:
+      - app_network
     restart: unless-stopped
 
   backend:
@@ -16,11 +19,32 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: fastapi_backend
-    command: poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-    ports:
-      - "8000:8000"
+    command: poetry run uvicorn app.main:app --host 0.0.0.0 --port 800
     volumes:
       - ./backend:/app
     environment:
       - PYTHONUNBUFFERED=1
+    expose:
+      - "8000" # доступен только внутри сети Docker
+    networks:
+      - app_network
     restart: unless-stopped
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx_proxy
+    ports:
+      - "80:80" # внешний порт
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app_network
+    restart: unless-stopped
+
+# 🔹 Определяем локальную сеть
+networks:
+  app_network:
+    driver: bridge

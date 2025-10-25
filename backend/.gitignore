@@ -15,7 +15,7 @@ __pycache__/
 blackouts.db
 
 # test-file
-test.py
+_test.*
 
 # Distribution / packaging
 .Python

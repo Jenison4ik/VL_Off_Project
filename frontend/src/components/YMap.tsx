@@ -5,7 +5,6 @@ import { initReactify } from "../services/initYandexMap";
 import type { YMapLocationRequest } from "ymaps3";
 import style from "../app/YMap.module.css";
 import BlackoutMarker from "@/components/BlackoutMarker";
-import { createHash } from "crypto";
 // === Типы ===
 import { Blackout, BlackoutByBuilding } from "@/types/Blackout";
 import getBlackouts from "@/services/getBlackouts";

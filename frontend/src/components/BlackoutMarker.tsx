@@ -1,6 +1,8 @@
 "use client";
 
+import { Blackout, BlackoutByBuilding } from "@/types/Blackout";
 import { useEffect, useState, useCallback } from "react";
+import { mixColors } from "@/utils/colorUtils";
 
 type Evt = { type: "closeAll" } | { type: "closeExcept"; id: string };
 
@@ -12,7 +14,7 @@ export default function BlackoutMarker({
   recordInteraction,
 }: {
   id: string;
-  data: any;
+  data: BlackoutByBuilding;
   Marker: any;
   emitter: {
     subscribe: (fn: (e: Evt) => void) => () => void;
@@ -21,7 +23,23 @@ export default function BlackoutMarker({
   recordInteraction: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-
+  const [color, setColor] = useState("#ffffff");
+  const colorByType = {
+    electricity: "#f5841b",
+    cold_water: "#0a12f5",
+    hot_water: "#f50a0a",
+    heat: "#0af531",
+  };
+  useEffect(() => {
+    const types = data.blackouts.map((item, index) => {
+      return item.type;
+    });
+    let color = colorByType[types[0]];
+    types.forEach((element, index) => {
+      color = mixColors(color, colorByType[element], 0.5);
+    });
+    setColor(color);
+  });
   useEffect(() => {
     const unsub = emitter.subscribe((e) => {
       if (e.type === "closeAll") {
@@ -54,10 +72,13 @@ export default function BlackoutMarker({
       //   border:
       // }}
       onClick={onMarkerClick}
-      coordinates={[data.coordinates[1], data.coordinates[0]]}
+      coordinates={[
+        parseFloat(data.coordinates[1]),
+        parseFloat(data.coordinates[0]),
+      ]}
       size="micro"
       color={{
-        day: `${data.type === "electricity" ? "#f17126ff" : "#2696f1ff"}`,
+        day: `${color}`,
         night: "#00ff00",
       }}
       popup={{
@@ -72,11 +93,11 @@ export default function BlackoutMarker({
             }}
           >
             <strong>
-              {data.type === "electricity"
+              {data.blackouts[0].type === "electricity"
                 ? "⚡ Отключение света"
                 : "💧 Отключение воды"}
             </strong>
-            <p>{data.description}</p>
+            <p>{data.blackouts[0].description}</p>
           </div>
         ),
       }}

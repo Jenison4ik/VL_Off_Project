@@ -5,11 +5,11 @@ import { initReactify } from "../services/initYandexMap";
 import type { YMapLocationRequest } from "ymaps3";
 import style from "../app/YMap.module.css";
 import BlackoutMarker from "@/components/BlackoutMarker";
-import { initMocks } from "@/server/initMocks";
-
+import { createHash } from "crypto";
 // === Типы ===
-import Blackout from "@/types/Blackout";
+import { Blackout, BlackoutByBuilding } from "@/types/Blackout";
 import getBlackouts from "@/services/getBlackouts";
+import convertBlackouts from "@/utils/convertBlackouts";
 
 type Evt = { type: "closeAll" } | { type: "closeExcept"; id: string };
 
@@ -53,7 +53,7 @@ export default function YandexMap() {
   const [mapComponents, setMapComponents] = useState<any>(null);
   const [markerComponent, setMarkerComponent] = useState<any>(null);
   const [zoomControl, setZoomControl] = useState<any>(null);
-  const [blackouts, setBlackouts] = useState<Blackout[]>([]);
+  const [blackouts, setBlackouts] = useState<BlackoutByBuilding[]>([]);
 
   const LOCATION: YMapLocationRequest = {
     center: [131.884293, 43.119515],
@@ -126,7 +126,11 @@ export default function YandexMap() {
         if (!res.ok) throw new Error("Ошибка загрузки данных");
 
         const blackouts = await getBlackouts();
-        setBlackouts(blackouts);
+        const t0 = performance.now();
+        const blackoutsByBuilding = convertBlackouts(blackouts);
+        const t1 = performance.now();
+        console.log(t1 - t0, "seconds");
+        setBlackouts(blackoutsByBuilding);
       } catch (err: any) {
         setError(err.message || "Не удалось загрузить точки");
       }
@@ -190,7 +194,7 @@ export default function YandexMap() {
   } = mapComponents;
 
   const YMapZoomControl = zoomControl;
-
+  let counter = 0;
   // === Рендер карты ===
   return (
     <div
@@ -211,21 +215,19 @@ export default function YandexMap() {
         {/* --- Маркеры --- */}
         {blackouts.map((b, i) => {
           try {
-            b.building.map((item, index) => {
-              const id = `${b.coordinates[0]}_${b.coordinates[1]}_${i}`;
-              return (
-                <BlackoutMarker
-                  key={id}
-                  id={id}
-                  data={b}
-                  Marker={markerComponent}
-                  emitter={emitterRef.current}
-                  recordInteraction={(id: string) =>
-                    recordInteraction("marker", id)
-                  }
-                />
-              );
-            });
+            const id = `${i}`;
+            return (
+              <BlackoutMarker
+                key={id}
+                id={id}
+                data={b}
+                Marker={markerComponent}
+                emitter={emitterRef.current}
+                recordInteraction={(id: string) =>
+                  recordInteraction("marker", id)
+                }
+              />
+            );
           } catch (error) {
             console.error("Error rendering blackout marker:", error);
             return null;

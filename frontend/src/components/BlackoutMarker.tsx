@@ -55,7 +55,7 @@ export default function BlackoutMarker({
    * Вычисляем итоговый цвет маркера и элементы описания отключений.
    * Мемоизация нужна, чтобы не пересчитывать при каждом рендере.
    */
-  const { mixedColor, blackoutElements } = useMemo(() => {
+  const { mixedColor, blackoutElements, blackoutText } = useMemo(() => {
     const types = data.blackouts.map((item) => item.type);
 
     // Генерация списка описаний отключений
@@ -69,7 +69,13 @@ export default function BlackoutMarker({
       mixedColor = mixColors(mixedColor, colorByType[types[i]], 0.5);
     }
 
-    return { mixedColor, blackoutElements };
+    const blackoutText = data.blackouts.map((item, index) => {
+      return (
+        <span key={`${item.type}-${index}`}>{"—  " + item.description}</span>
+      );
+    });
+
+    return { mixedColor, blackoutElements, blackoutText };
   }, [data.blackouts]);
 
   /**
@@ -127,9 +133,14 @@ export default function BlackoutMarker({
             }}
           >
             {blackoutElements.map((el, i) => (
-              <div key={i}>{el}</div>
+              <p key={i}>{el}</p>
             ))}
-            <p>{data.blackouts[0].description}</p>
+            <div>
+              {blackoutText.map((el, i) => {
+                console.log(1);
+                return <p key={i}>{el}</p>;
+              })}
+            </div>
           </div>
         ),
       }}

@@ -125,10 +125,7 @@ export default function YandexMap() {
         if (!res.ok) throw new Error("Ошибка загрузки данных");
 
         const blackouts = await getBlackouts();
-        const t0 = performance.now();
         const blackoutsByBuilding = convertBlackouts(blackouts);
-        const t1 = performance.now();
-        console.log(t1 - t0, "seconds");
         setBlackouts(blackoutsByBuilding);
       } catch (err: any) {
         setError(err.message || "Не удалось загрузить точки");

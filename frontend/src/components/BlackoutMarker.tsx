@@ -1,85 +1,119 @@
 "use client";
 
-import { Blackout, BlackoutByBuilding } from "@/types/Blackout";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { mixColors } from "@/utils/colorUtils";
+import type { BlackoutByBuilding } from "@/types/Blackout";
 
-type Evt = { type: "closeAll" } | { type: "closeExcept"; id: string };
+/**
+ * Тип событий для эмиттера
+ */
+type EmitterEvent = { type: "closeAll" } | { type: "closeExcept"; id: string };
 
+/**
+ * Интерфейс пропсов компонента BlackoutMarker
+ */
+interface BlackoutMarkerProps {
+  id: string;
+  data: BlackoutByBuilding;
+  Marker: React.ComponentType<any>;
+  emitter: {
+    subscribe: (fn: (e: EmitterEvent) => void) => () => void;
+    publish: (e: EmitterEvent) => void;
+  };
+  recordInteraction: (id: string) => void;
+}
+
+/**
+ * Компонент отображает маркер на карте с popup'ом об отключениях
+ */
 export default function BlackoutMarker({
   id,
   data,
   Marker,
   emitter,
   recordInteraction,
-}: {
-  id: string;
-  data: BlackoutByBuilding;
-  Marker: any;
-  emitter: {
-    subscribe: (fn: (e: Evt) => void) => () => void;
-    publish: (e: Evt) => void;
-  };
-  recordInteraction: (id: string) => void;
-}) {
+}: BlackoutMarkerProps) {
   const [open, setOpen] = useState(false);
-  const [color, setColor] = useState("#ffffff");
+
+  // Цвета по типу отключения
   const colorByType = {
     electricity: "#f5841b",
     cold_water: "#0a12f5",
     hot_water: "#f50a0a",
     heat: "#0af531",
   };
+
+  // Текст для popup'а по типу
+  const typesText = new Map([
+    ["electricity", "⚡ Отключение света"],
+    ["cold_water", "❄️💧 Отключение холодной воды"],
+    ["hot_water", "🔥💧 Отключение горячей воды"],
+    ["heat", "🔥 Отключение отопления"],
+  ]);
+
+  /**
+   * Вычисляем итоговый цвет маркера и элементы описания отключений.
+   * Мемоизация нужна, чтобы не пересчитывать при каждом рендере.
+   */
+  const { mixedColor, blackoutElements } = useMemo(() => {
+    const types = data.blackouts.map((item) => item.type);
+
+    // Генерация списка описаний отключений
+    const blackoutElements = data.blackouts.map((item, index) => (
+      <strong key={`${item.type}-${index}`}>{typesText.get(item.type)}</strong>
+    ));
+
+    // Смешиваем цвета всех типов отключений
+    let mixedColor = colorByType[types[0]];
+    for (let i = 1; i < types.length; i++) {
+      mixedColor = mixColors(mixedColor, colorByType[types[i]], 0.5);
+    }
+
+    return { mixedColor, blackoutElements };
+  }, [data.blackouts]);
+
+  /**
+   * Подписка на события emitter'а: закрытие popup'ов других маркеров.
+   */
   useEffect(() => {
-    const types = data.blackouts.map((item, index) => {
-      return item.type;
-    });
-    let color = colorByType[types[0]];
-    types.forEach((element, index) => {
-      color = mixColors(color, colorByType[element], 0.5);
-    });
-    setColor(color);
-  });
-  useEffect(() => {
-    const unsub = emitter.subscribe((e) => {
-      if (e.type === "closeAll") {
+    const unsubscribe = emitter.subscribe((event) => {
+      if (
+        event.type === "closeAll" ||
+        (event.type === "closeExcept" && event.id !== id)
+      ) {
         setOpen(false);
-      } else if (e.type === "closeExcept") {
-        if (e.id !== id) setOpen(false);
       }
     });
-    return unsub;
+    return unsubscribe;
   }, [emitter, id]);
 
-  const onMarkerClick = useCallback(
+  /**
+   * Обработчик клика по маркеру.
+   * Открывает popup и сообщает другим маркерам закрыться.
+   */
+  const handleMarkerClick = useCallback(
     (e?: any) => {
-      // открываем себя и просим закрыть остальные
       setOpen(true);
       emitter.publish({ type: "closeExcept", id });
       recordInteraction(id);
-      // при необходимости остановите всплытие ymaps-события, если доступно:
-      try {
-        e?.originalEvent?.stopPropagation?.();
-      } catch {}
+
+      // Если это событие карты — остановим всплытие
+      e?.originalEvent?.stopPropagation?.();
     },
     [emitter, id, recordInteraction]
   );
+
   return (
     <Marker
-      // style={{
-      //   boxShadow: "none",
-      //   outline: "none",
-      //   border:
-      // }}
-      onClick={onMarkerClick}
+      onClick={handleMarkerClick}
       coordinates={[
         parseFloat(data.coordinates[1]),
         parseFloat(data.coordinates[0]),
       ]}
       size="micro"
       color={{
-        day: `${color}`,
-        night: "#00ff00",
+        day: mixedColor,
+        night: "#00ff00", // можно позже заменить на динамическую тему
       }}
       popup={{
         show: open,
@@ -88,15 +122,13 @@ export default function BlackoutMarker({
             style={{
               padding: "6px 10px",
               background: "#fff",
-              //   boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
               fontSize: 14,
+              lineHeight: 1.4,
             }}
           >
-            <strong>
-              {data.blackouts[0].type === "electricity"
-                ? "⚡ Отключение света"
-                : "💧 Отключение воды"}
-            </strong>
+            {blackoutElements.map((el, i) => (
+              <div key={i}>{el}</div>
+            ))}
             <p>{data.blackouts[0].description}</p>
           </div>
         ),

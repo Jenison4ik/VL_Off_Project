@@ -8,11 +8,8 @@ import BlackoutMarker from "@/components/BlackoutMarker";
 import { initMocks } from "@/server/initMocks";
 
 // === Типы ===
-type Blackout = {
-  coordinates: [number, number];
-  type: string;
-  description: string;
-};
+import Blackout from "@/types/Blackout";
+import getBlackouts from "@/services/getBlackouts";
 
 type Evt = { type: "closeAll" } | { type: "closeExcept"; id: string };
 
@@ -39,8 +36,6 @@ function createEmitter() {
 
 // === Основной компонент карты ===
 export default function YandexMap() {
-  initMocks();
-
   // --- refs и состояния ---
   const mapRef = useRef<any>(null);
   const emitterRef = useRef(createEmitter());
@@ -130,8 +125,8 @@ export default function YandexMap() {
         const res = await fetch("api/v1/blackouts");
         if (!res.ok) throw new Error("Ошибка загрузки данных");
 
-        const data = await res.json();
-        setBlackouts(data);
+        const blackouts = await getBlackouts();
+        setBlackouts(blackouts);
       } catch (err: any) {
         setError(err.message || "Не удалось загрузить точки");
       }
@@ -216,19 +211,21 @@ export default function YandexMap() {
         {/* --- Маркеры --- */}
         {blackouts.map((b, i) => {
           try {
-            const id = `${b.coordinates[0]}_${b.coordinates[1]}_${i}`;
-            return (
-              <BlackoutMarker
-                key={id}
-                id={id}
-                data={b}
-                Marker={markerComponent}
-                emitter={emitterRef.current}
-                recordInteraction={(id: string) =>
-                  recordInteraction("marker", id)
-                }
-              />
-            );
+            b.building.map((item, index) => {
+              const id = `${b.coordinates[0]}_${b.coordinates[1]}_${i}`;
+              return (
+                <BlackoutMarker
+                  key={id}
+                  id={id}
+                  data={b}
+                  Marker={markerComponent}
+                  emitter={emitterRef.current}
+                  recordInteraction={(id: string) =>
+                    recordInteraction("marker", id)
+                  }
+                />
+              );
+            });
           } catch (error) {
             console.error("Error rendering blackout marker:", error);
             return null;

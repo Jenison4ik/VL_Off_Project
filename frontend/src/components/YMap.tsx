@@ -193,26 +193,45 @@ export default function YandexMap() {
   };
 
   // === Отрисовка кластера ===
-  const renderCluster = (coordinates: [number, number], features: any[]) => (
-    <YMapMarker coordinates={coordinates}>
-      <div
-        style={{
-          background: "rgba(0, 120, 255, 0.8)",
-          borderRadius: "50%",
-          color: "#fff",
-          width: 32,
-          height: 32,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: "bold",
-          cursor: "pointer",
-        }}
-      >
-        {features.length}
-      </div>
-    </YMapMarker>
-  );
+  const renderCluster = (coordinates: [number, number], features: any[]) => {
+    const handleClusterClick = () => {
+      if (!mapRef.current) return;
+      const map = mapRef.current;
+      const currentZoom = map.zoom || 13;
+
+      // Приближаем карту к кластеру (но не выше 20)
+      map.update({
+        location: {
+          center: coordinates,
+          zoom: Math.min(currentZoom + 2, 20),
+        },
+        duration: 300, // плавная анимация
+      });
+    };
+    return (
+      <YMapMarker coordinates={coordinates} onClick={handleClusterClick}>
+        <div
+          style={{
+            background: "#ff8b46",
+            padding: 0,
+            margin: 0,
+            border: "1px solid #fff",
+            borderRadius: "50%",
+            color: "#fff",
+            width: 32,
+            height: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: "bold",
+            cursor: "pointer",
+          }}
+        >
+          {features.length}
+        </div>
+      </YMapMarker>
+    );
+  };
 
   return (
     <div
@@ -241,14 +260,19 @@ export default function YandexMap() {
         {/* --- Панель управления --- */}
         <YMapControls position="top right">
           <YMapControl>
-            <button onClick={toggleFullscreen} title="Полный экран">
-              {isFullscreen ? "⤡" : "⤢"}
-            </button>
+            {typeof window !== "undefined" && window.innerWidth > 768 && (
+              <button onClick={toggleFullscreen} title="Полный экран">
+                <img src="/file.svg" alt="file" />
+                {isFullscreen ? "⤡" : "⤢"}
+              </button>
+            )}
           </YMapControl>
         </YMapControls>
 
         <YMapControls position="left">
-          <YMapZoomControl />
+          {typeof window !== "undefined" && window.innerWidth > 768 && (
+            <YMapZoomControl />
+          )}
         </YMapControls>
 
         <YMapListener onClick={onMapClick} />

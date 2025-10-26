@@ -76,9 +76,13 @@ export default function BlackoutMarker({
         return mixColors(acc, colorByType[type], 0.5);
       }, "");
 
-      // Уникальные описания отключений
+      // Уникальные описания отключений (фильтруем пустые)
       const uniqueDescriptions = Array.from(
-        new Set(data.blackouts.map((b) => b.description))
+        new Set(
+          data.blackouts
+            .map((b) => b.description)
+            .filter((desc) => desc && desc.length > 0)
+        )
       );
 
       // JSX для описаний
@@ -125,6 +129,7 @@ export default function BlackoutMarker({
   const popupContent = (
     <div
       style={{
+        maxWidth: "75vw",
         padding: "6px 10px",
         background: "#fff",
         fontSize: 14,
@@ -150,7 +155,11 @@ export default function BlackoutMarker({
     <Marker
       onClick={handleMarkerClick}
       coordinates={coordinates}
-      size="micro"
+      size={
+        typeof window !== "undefined" && window.innerWidth > 768
+          ? "micro"
+          : "small"
+      }
       color={{
         day: mixedColor,
         night: "#00ff00", // TODO: заменить на динамическую тему

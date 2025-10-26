@@ -1,4 +1,4 @@
-import Blackout from "@/types/Blackout";
+import { Blackout } from "@/types/Blackout";
 
 export default async function getBlackouts(): Promise<Blackout[]> {
   const res = await fetch("/api/v1/blackouts");

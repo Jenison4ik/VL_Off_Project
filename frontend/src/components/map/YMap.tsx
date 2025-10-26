@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { initReactify } from "../services/initYandexMap";
+import { initReactify } from "../../services/initYandexMap";
 import type { YMapLocationRequest } from "ymaps3";
-import style from "../app/YMap.module.css";
-import BlackoutMarker from "@/components/BlackoutMarker";
+import style from "@/app/YMap.module.css";
+import BlackoutMarker from "@/components/map/BlackoutMarker";
 import { BlackoutByBuilding } from "@/types/Blackout";
 import getBlackouts from "@/services/getBlackouts";
 import convertBlackouts from "@/utils/convertBlackouts";

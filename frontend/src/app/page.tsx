@@ -3,7 +3,6 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import YMap from "../components/map/YMap";
 import Users from "../components/Users";
-import { server } from "@/mocks/server";
 import { MockInitializer } from "@/components/MockInitializer";
 
 export default async function Home() {

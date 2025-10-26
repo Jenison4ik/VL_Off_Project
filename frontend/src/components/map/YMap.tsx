@@ -121,9 +121,8 @@ export default function YandexMap() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("api/v1/blackouts");
-        if (!res.ok) throw new Error("Ошибка загрузки данных");
         const data = await getBlackouts();
+        // if (!res.ok) throw new Error("Ошибка загрузки данных");
         setBlackouts(convertBlackouts(data));
       } catch (err: any) {
         setError(err.message || "Не удалось загрузить данные");

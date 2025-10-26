@@ -7,7 +7,6 @@ class ApiV1Prefix(BaseModel):
     blackouts: str = '/blackouts'
 
 class ApiPrefix(BaseModel):
-    prefix: str = '/api'
     v1: ApiV1Prefix = ApiV1Prefix() 
 
 

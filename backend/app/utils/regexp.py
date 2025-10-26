@@ -1,6 +1,6 @@
 import re
 
-def normalize_coordinates(coordinates: str):
+def normalize_coordinates(coordinates: str) -> tuple[str]:
     if not coordinates:
         return None
 

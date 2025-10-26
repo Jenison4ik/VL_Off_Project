@@ -5,12 +5,12 @@ import { mixColors } from "@/utils/colorUtils";
 import type { BlackoutByBuilding } from "@/types/Blackout";
 
 /**
- * Тип событий для эмиттера
+ * Тип событий для emitter'а маркеров.
  */
 type EmitterEvent = { type: "closeAll" } | { type: "closeExcept"; id: string };
 
 /**
- * Интерфейс пропсов компонента BlackoutMarker
+ * Пропсы компонента BlackoutMarker.
  */
 interface BlackoutMarkerProps {
   id: string;
@@ -24,7 +24,8 @@ interface BlackoutMarkerProps {
 }
 
 /**
- * Компонент отображает маркер на карте с popup'ом об отключениях
+ * Компонент маркера отключений на карте.
+ * Отображает цветной маркер с popup'ом, в котором указаны типы и описания отключений.
  */
 export default function BlackoutMarker({
   id,
@@ -35,15 +36,15 @@ export default function BlackoutMarker({
 }: BlackoutMarkerProps) {
   const [open, setOpen] = useState(false);
 
-  // Цвета по типу отключения
-  const colorByType = {
-    electricity: "#f5841b",
+  /** Цвета по типам отключений */
+  const colorByType: Record<string, string> = {
+    electricity: "#f7a500",
     cold_water: "#0a12f5",
-    hot_water: "#f50a0a",
-    heat: "#0af531",
+    hot_water: "#0a12f5",
+    heat: "#c20000",
   };
 
-  // Текст для popup'а по типу
+  /** Заголовки для popup'а по типам */
   const typesText = new Map([
     ["electricity", "⚡ Отключение света"],
     ["cold_water", "❄️💧 Отключение холодной воды"],
@@ -52,98 +53,109 @@ export default function BlackoutMarker({
   ]);
 
   /**
-   * Вычисляем итоговый цвет маркера и элементы описания отключений.
-   * Мемоизация нужна, чтобы не пересчитывать при каждом рендере.
+   * Мемоизированный расчет данных для popup'а:
+   * - смешанный цвет маркера
+   * - список уникальных типов отключений
+   * - список уникальных описаний
    */
-  const { mixedColor, blackoutElements, blackoutText } = useMemo(() => {
-    const types = data.blackouts.map((item) => item.type);
-
-    // Генерация списка описаний отключений
-    const blackoutElements = data.blackouts.map((item, index) => (
-      <strong key={`${item.type}-${index}`}>{typesText.get(item.type)}</strong>
-    ));
-
-    // Смешиваем цвета всех типов отключений
-    let mixedColor = colorByType[types[0]];
-    for (let i = 1; i < types.length; i++) {
-      mixedColor = mixColors(mixedColor, colorByType[types[i]], 0.5);
-    }
-
-    const blackoutText = data.blackouts.map((item, index) => {
-      return (
-        <span key={`${item.type}-${index}`}>{"—  " + item.description}</span>
+  const { mixedColor, blackoutTypeElements, blackoutDescriptionElements } =
+    useMemo(() => {
+      // Уникальные типы отключений
+      const uniqueTypes = Array.from(
+        new Set(data.blackouts.map((b) => b.type))
       );
-    });
 
-    return { mixedColor, blackoutElements, blackoutText };
-  }, [data.blackouts]);
+      // JSX для заголовков по типам
+      const blackoutTypeElements = uniqueTypes.map((type, index) => (
+        <strong key={type}>{typesText.get(type)}</strong>
+      ));
+
+      // Смешиваем цвета всех типов
+      const mixedColor = uniqueTypes.reduce((acc, type, index) => {
+        if (index === 0) return colorByType[type];
+        return mixColors(acc, colorByType[type], 0.5);
+      }, "");
+
+      // Уникальные описания отключений
+      const uniqueDescriptions = Array.from(
+        new Set(data.blackouts.map((b) => b.description))
+      );
+
+      // JSX для описаний
+      const blackoutDescriptionElements = uniqueDescriptions.map((desc, i) => (
+        <span key={i}>{"— " + desc}</span>
+      ));
+
+      return { mixedColor, blackoutTypeElements, blackoutDescriptionElements };
+    }, [data.blackouts]);
 
   /**
-   * Подписка на события emitter'а: закрытие popup'ов других маркеров.
+   * Подписка на события emitter'а.
+   * Закрывает popup, если пришло событие закрытия всех или всех, кроме текущего.
    */
   useEffect(() => {
     const unsubscribe = emitter.subscribe((event) => {
-      if (
+      const shouldClose =
         event.type === "closeAll" ||
-        (event.type === "closeExcept" && event.id !== id)
-      ) {
-        setOpen(false);
-      }
+        (event.type === "closeExcept" && event.id !== id);
+
+      if (shouldClose) setOpen(false);
     });
+
     return unsubscribe;
   }, [emitter, id]);
 
   /**
    * Обработчик клика по маркеру.
-   * Открывает popup и сообщает другим маркерам закрыться.
+   * Открывает popup и уведомляет другие маркеры закрыться.
    */
   const handleMarkerClick = useCallback(
     (e?: any) => {
       setOpen(true);
       emitter.publish({ type: "closeExcept", id });
       recordInteraction(id);
-
-      // Если это событие карты — остановим всплытие
-      e?.originalEvent?.stopPropagation?.();
+      e?.originalEvent?.stopPropagation?.(); // останавливаем всплытие клика на карте
     },
     [emitter, id, recordInteraction]
   );
 
+  /**
+   * Popup-содержимое маркера.
+   */
+  const popupContent = (
+    <div
+      style={{
+        padding: "6px 10px",
+        background: "#fff",
+        fontSize: 14,
+        lineHeight: 1.4,
+      }}
+    >
+      {blackoutTypeElements.map((el, i) => (
+        <p key={`type-${i}`}>{el}</p>
+      ))}
+      {blackoutDescriptionElements.map((el, i) => (
+        <p key={`desc-${i}`}>{el}</p>
+      ))}
+    </div>
+  );
+
+  /** Координаты для карты (в формате [долгота, широта]) */
+  const coordinates = [
+    parseFloat(data.coordinates[1]),
+    parseFloat(data.coordinates[0]),
+  ];
+
   return (
     <Marker
       onClick={handleMarkerClick}
-      coordinates={[
-        parseFloat(data.coordinates[1]),
-        parseFloat(data.coordinates[0]),
-      ]}
+      coordinates={coordinates}
       size="micro"
       color={{
         day: mixedColor,
-        night: "#00ff00", // можно позже заменить на динамическую тему
+        night: "#00ff00", // TODO: заменить на динамическую тему
       }}
-      popup={{
-        show: open,
-        content: () => (
-          <div
-            style={{
-              padding: "6px 10px",
-              background: "#fff",
-              fontSize: 14,
-              lineHeight: 1.4,
-            }}
-          >
-            {blackoutElements.map((el, i) => (
-              <p key={i}>{el}</p>
-            ))}
-            <div>
-              {blackoutText.map((el, i) => {
-                console.log(1);
-                return <p key={i}>{el}</p>;
-              })}
-            </div>
-          </div>
-        ),
-      }}
+      popup={{ show: open, content: () => popupContent }}
     />
   );
 }

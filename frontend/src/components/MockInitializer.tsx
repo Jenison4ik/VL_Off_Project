@@ -30,7 +30,7 @@ export function MockInitializer({
     };
   }, []);
   if (!isMockReady) {
-    return <div>Loading mocks...</div>;
+    return <></>;
   }
   return <>{children}</>;
 }

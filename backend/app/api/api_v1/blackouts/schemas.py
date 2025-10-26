@@ -23,3 +23,24 @@ class BlackoutWithBuildingsSchema(BaseModel):
 
     class Config:
         from_attributes = True
+        
+        
+
+class BlackoutSchema(BaseModel):
+    id: str = Field(..., description="ID отключения")
+    start: Optional[str] = Field(None, description="Дата начала отключения")
+    end: Optional[str] = Field(None, description="Дата окончания отключения")
+    description: Optional[str] = Field(None, description="Описание отключения")
+    type: Optional[str] = Field(None, description="Тип отключения")
+    initiator_name: Optional[str] = Field(None, description="Инициатор отключения")
+
+    class Config:
+        from_attributes = True
+
+
+class BlackoutsForBuildingSchema(BaseModel):
+    blackouts: List[BlackoutSchema] = Field(..., description="Список отключений для здания")
+    address: Optional[str] = Field(None, description="Адрес здания")
+
+    class Config:
+        from_attributes = True

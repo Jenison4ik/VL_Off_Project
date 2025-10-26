@@ -39,9 +39,11 @@ async def get_all_blackouts(
             "type": b.type,
         }
         for build in b.buildings:
-            blackout["buildings"].append({
-                "coordinates": normalize_coordinates(build.coordinates)
-            })
+            coords = normalize_coordinates(build.coordinates)
+            if coords:
+                blackout["buildings"].append({
+                    "coordinates": coords
+                })
         data.append(blackout)
     print(len(data))
     return data

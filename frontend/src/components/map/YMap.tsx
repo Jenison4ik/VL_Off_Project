@@ -60,55 +60,60 @@ export default function YandexMap() {
     []
   );
 
-  // === Загрузка данных и карты ===
   useEffect(() => {
     let mounted = true;
-    let cleanup: (() => void) | undefined;
+
+    const initMap = async () => {
+      const reactify = await initReactify();
+      if (!mounted) return;
+
+      const components = reactify.module(window.ymaps3);
+      setMapComponents(components);
+
+      window.ymaps3.import.registerCdn(
+        "https://cdn.jsdelivr.net/npm/{package}",
+        "@yandex/ymaps3-clusterer@0.0.1"
+      );
+      window.ymaps3.import.registerCdn(
+        "https://cdn.jsdelivr.net/npm/{package}",
+        "@yandex/ymaps3-default-ui-theme@latest"
+      );
+
+      const themeModule = await window.ymaps3.import(
+        "@yandex/ymaps3-default-ui-theme"
+      );
+      const { YMapDefaultMarker, YMapZoomControl } =
+        reactify.module(themeModule);
+      setMarkerComponent(() => YMapDefaultMarker);
+      setZoomControl(() => YMapZoomControl);
+
+      const clusterModule = reactify.module(
+        await ymaps3.import("@yandex/ymaps3-clusterer@0.0.1")
+      );
+      setClusterer(clusterModule);
+    };
+
+    const loadData = async () => {
+      const data = await getBlackouts();
+      if (!mounted) return;
+      setBlackouts(convertBlackouts(data));
+    };
+
+    setIsLoading(true);
 
     (async () => {
       try {
-        setIsLoading(true);
+        // Выполняем параллельно
+        await Promise.all([initMap(), loadData()]);
 
-        // 1️⃣ Загружаем данные
-        const data = await getBlackouts();
-        if (!mounted) return;
-        setBlackouts(convertBlackouts(data));
-
-        // 2️⃣ Инициализируем карту
-        const reactify = await initReactify();
-        if (!mounted) return;
-
-        const components = reactify.module(window.ymaps3);
-        setMapComponents(components);
-
-        window.ymaps3.import.registerCdn(
-          "https://cdn.jsdelivr.net/npm/{package}",
-          "@yandex/ymaps3-clusterer@0.0.1"
-        );
-        window.ymaps3.import.registerCdn(
-          "https://cdn.jsdelivr.net/npm/{package}",
-          "@yandex/ymaps3-default-ui-theme@latest"
-        );
-
-        const themeModule = await window.ymaps3.import(
-          "@yandex/ymaps3-default-ui-theme"
-        );
-        const { YMapDefaultMarker, YMapZoomControl } =
-          reactify.module(themeModule);
-        setMarkerComponent(() => YMapDefaultMarker);
-        setZoomControl(() => YMapZoomControl);
-
-        const clusterModule = reactify.module(
-          await ymaps3.import("@yandex/ymaps3-clusterer@0.0.1")
-        );
-        setClusterer(clusterModule);
-
+        // После загрузки подписываем fullscreen
         const handleFullscreenChange = () => {
           setIsFullscreen(Boolean(document.fullscreenElement));
           mapRef.current?.container?.fitToViewport?.();
         };
         document.addEventListener("fullscreenchange", handleFullscreenChange);
-        cleanup = () =>
+
+        return () =>
           document.removeEventListener(
             "fullscreenchange",
             handleFullscreenChange
@@ -123,7 +128,6 @@ export default function YandexMap() {
 
     return () => {
       mounted = false;
-      cleanup?.();
     };
   }, []);
 

@@ -1,0 +1,16 @@
+"use client";
+import { useState, useEffect } from "react";
+
+function useDeounce<T>(value: T, delay = 500): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  return debouncedValue;
+}
+export default function Search() {
+  useEffect(() => {});
+
+  return <input type="text" placeholder="Search" />;
+}

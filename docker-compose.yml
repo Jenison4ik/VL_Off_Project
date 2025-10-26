@@ -20,7 +20,7 @@ services:
       dockerfile: Dockerfile
     container_name: fastapi_backend
     ports:
-      - "8000:8000"  # теперь доступен с localhost
+      - "8000:8000" # теперь доступен с localhost
     environment:
       - PYTHONUNBUFFERED=1
     working_dir: /app/app
@@ -28,6 +28,8 @@ services:
     networks:
       - app_network
     restart: unless-stopped
+    volumes:
+      - ./backend:/app
 
   nginx:
     build:

@@ -15,6 +15,7 @@ mapper_registry = registry()
 # Достаём таблицы 
 blackouts_table = metadata.tables["blackouts"]
 buildings_table = metadata.tables["buildings"]
+streets_table = metadata.tables["streets"]
 blackouts_buildings_table = metadata.tables["blackouts_buildings"]
 
 
@@ -38,4 +39,20 @@ class Building:
         "Blackout",
         secondary=blackouts_buildings_table,
         back_populates="buildings"
+    )
+    
+    street = relationship(
+        "Street",
+        primaryjoin="Building.street_id == Street.id",
+        lazy="joined"
+    )
+
+
+@mapper_registry.mapped
+class Street:
+    __table__ = streets_table
+
+    buildings = relationship(
+        "Building",
+        back_populates="street"
     )

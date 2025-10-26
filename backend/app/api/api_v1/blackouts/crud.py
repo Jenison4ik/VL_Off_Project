@@ -25,7 +25,7 @@ async def get_all_blackouts(
     stmt = select(Blackout).where(Blackout.id.in_(select(subquery.c.id)))
 
     result = await session.execute(stmt)
-    blackouts = result.scalars().all()
+    blackouts = result.scalars().unique().all()
     
     data = []
     
@@ -40,11 +40,14 @@ async def get_all_blackouts(
         }
         for build in b.buildings:
             coords = normalize_coordinates(build.coordinates)
-            if coords:
+            street = build.street.name if build.street else None
+            if coords and street:
+                street += build.number
                 blackout["buildings"].append({
-                    "coordinates": coords
+                    "coordinates": coords,
+                    "address": street,
+                    "build_id": build.id
                 })
         data.append(blackout)
     print(len(data))
     return data
-

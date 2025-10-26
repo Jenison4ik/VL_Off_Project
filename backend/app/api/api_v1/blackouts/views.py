@@ -17,7 +17,7 @@ router = APIRouter(
 @router.get('')
 async def get_blackouts(
     session: Annotated[AsyncSession, Depends(db_helper.async_session_getter)]
-) -> BlackoutWithBuildingsSchema:
+) -> list[BlackoutWithBuildingsSchema]:
     blackouts = await get_all_blackouts(session=session)
     return blackouts
     

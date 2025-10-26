@@ -1,7 +1,13 @@
 import re
 
 def normalize_coordinates(coordinates: str):
+    if not coordinates:
+        return None
+
     pattern = r'"lat":\s*([\d.-]+),\s*"lon":\s*([\d.-]+)'
-    correct_coordinates = re.search(pattern, coordinates).groups()
-    # print(correct_coordinates)
-    return correct_coordinates
+    match = re.search(pattern, coordinates)
+
+    if not match:
+        return None
+
+    return match.groups()

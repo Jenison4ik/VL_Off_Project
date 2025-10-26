@@ -6,7 +6,7 @@ export const handlers = [
   http.get("/users", () => {
     return HttpResponse.json(adresses);
   }),
-  http.get("/api/blackouts", () => {
+  http.get("/api/api/v1/blackouts", () => {
     return HttpResponse.json(blackouts);
   }),
 ];

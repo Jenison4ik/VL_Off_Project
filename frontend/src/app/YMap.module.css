@@ -1,25 +1,54 @@
-/* .map{
-    min-width: 800px;
-    min-height: 500px;
-    max-width: 100vw;
-    max-height: 100vh;
-} */
 .map {
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
   font-family: Arial, Helvetica, sans-serif;
+  position: relative;
 }
-.toolbar {
-  position: absolute;
-  z-index: 1000;
-  top: 0;
-  left: 0;
+
+/* Центрированный блок загрузки */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 500px; /* чтобы совпадало с картой */
+  background-color: #f3f3f3;
+  color: #444;
+  font-size: 16px;
+  position: relative;
+  border-radius: 8px;
+}
+
+/* Круглый спиннер */
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #0078ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Кластер */
+.cluster {
+  background: #ff8b46;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  color: #fff;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
-  padding: 16px;
-}
-.toolbar a {
-  padding: 16px;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
 }

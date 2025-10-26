@@ -2,7 +2,6 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import YMap from "../components/map/YMap";
-import Users from "../components/Users";
 import { MockInitializer } from "@/components/MockInitializer";
 
 export default async function Home() {
@@ -11,17 +10,15 @@ export default async function Home() {
       <h1>Привет</h1>
       <MockInitializer>
         <YMap />
-        <Users />
       </MockInitializer>
       <p>
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Dicta, in
-        tempora. Numquam, voluptatem atque? Soluta, a qui fugit voluptate facere
-        reprehenderit corrupti quidem laborum necessitatibus non voluptas
-        nostrum, quisquam ab?
+        Проект представляет собой редизайн сайта **VL-OFF** — сервиса, который
+        информирует жителей Владивостока об отключениях воды, света и других
+        коммунальных услуг. Цель проекта — улучшить пользовательский опыт за
+        счёт обновлённого интерфейса, удобной навигации и современной визуальной
+        концепции, сохранив при этом основную функциональность и актуальность
+        данных.
       </p>
-      <MockInitializer>
-        <Users />
-      </MockInitializer>
     </>
   );
 }

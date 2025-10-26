@@ -1,18 +1,24 @@
+# 1. Базовый образ с Python
 FROM python:3.11-slim
 
-# Устанавливаем Poetry
-RUN pip install --no-cache-dir poetry
-
-# Рабочая директория
+# 2. Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем зависимости
-COPY pyproject.toml poetry.lock* ./
+# 3. Копируем только requirements для кеша зависимостей
+COPY requirements.txt .
 
-# Устанавливаем зависимости (без виртуалки)
-RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
+# 4. Устанавливаем зависимости (в отдельном слое)
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем код приложения
+# 5. Копируем всё приложение
 COPY . .
 
-# Запуск произойдёт через docker-compose
+# 6. Устанавливаем переменную окружения (чтобы Python не кешировал .pyc)
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# 7. Переходим в директорию, из которой нужно запускать
+WORKDIR /app/app
+
+# 8. Команда запуска FastAPI через Uvicorn
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

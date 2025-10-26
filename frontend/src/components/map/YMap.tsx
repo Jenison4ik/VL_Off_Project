@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { initReactify } from "../../services/initYandexMap";
 import type { YMapLocationRequest } from "ymaps3";
 import style from "@/app/YMap.module.css";
@@ -46,13 +46,13 @@ export default function YandexMap() {
   const [zoomControl, setZoomControl] = useState<any>(null);
   const [clusterer, setClusterer] = useState<any>(null);
   const [blackouts, setBlackouts] = useState<BlackoutByBuilding[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const LOCATION: YMapLocationRequest = {
     center: [131.884293, 43.119515],
     zoom: 13,
   };
 
-  // === Запись взаимодействий ===
   const recordInteraction = useCallback(
     (type: "marker" | "map", id?: string) => {
       lastInteractionRef.current = { type, ts: Date.now(), id };
@@ -60,20 +60,27 @@ export default function YandexMap() {
     []
   );
 
-  // === Инициализация карты ===
+  // === Загрузка данных и карты ===
   useEffect(() => {
     let mounted = true;
     let cleanup: (() => void) | undefined;
 
     (async () => {
       try {
+        setIsLoading(true);
+
+        // 1️⃣ Загружаем данные
+        const data = await getBlackouts();
+        if (!mounted) return;
+        setBlackouts(convertBlackouts(data));
+
+        // 2️⃣ Инициализируем карту
         const reactify = await initReactify();
         if (!mounted) return;
 
         const components = reactify.module(window.ymaps3);
         setMapComponents(components);
 
-        // Подключаем кластерер и тему
         window.ymaps3.import.registerCdn(
           "https://cdn.jsdelivr.net/npm/{package}",
           "@yandex/ymaps3-clusterer@0.0.1"
@@ -107,7 +114,10 @@ export default function YandexMap() {
             handleFullscreenChange
           );
       } catch (err: any) {
-        if (mounted) setError(err.message || "Ошибка загрузки карты");
+        if (mounted)
+          setError(err.message || "Ошибка загрузки карты или данных");
+      } finally {
+        if (mounted) setIsLoading(false);
       }
     })();
 
@@ -115,19 +125,6 @@ export default function YandexMap() {
       mounted = false;
       cleanup?.();
     };
-  }, []);
-
-  // === Загрузка данных ===
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await getBlackouts();
-        // if (!res.ok) throw new Error("Ошибка загрузки данных");
-        setBlackouts(convertBlackouts(data));
-      } catch (err: any) {
-        setError(err.message || "Не удалось загрузить данные");
-      }
-    })();
   }, []);
 
   const toggleFullscreen = useCallback(() => {
@@ -148,10 +145,24 @@ export default function YandexMap() {
     recordInteraction("map");
   }, [recordInteraction]);
 
+  // === Состояния ===
   if (error) return <div className={style.map}>Ошибка: {error}</div>;
+  if (isLoading)
+    return (
+      <div className={`${style.map} ${style.loadingContainer}`}>
+        <div className={style.loader}></div>
+        <p>Загрузка карты...</p>
+      </div>
+    );
   if (!mapComponents || !markerComponent || !zoomControl || !clusterer)
-    return <div>Загрузка карты...</div>;
+    return (
+      <div className={`${style.map} ${style.loadingContainer}`}>
+        <div className={style.loader}></div>
+        <p>Инициализация карты...</p>
+      </div>
+    );
 
+  // === Извлекаем компоненты карты ===
   const {
     YMap,
     YMapDefaultSchemeLayer,
@@ -164,7 +175,7 @@ export default function YandexMap() {
   const { YMapClusterer, clusterByGrid } = clusterer;
   const YMapZoomControl = zoomControl;
 
-  // === Создаём features для кластерера ===
+  // === Подготовка данных для кластерера ===
   const features = blackouts.map((b, i) => ({
     type: "Feature",
     id: i,
@@ -175,7 +186,7 @@ export default function YandexMap() {
     properties: { blackout: b },
   }));
 
-  // === Кастомный маркер ===
+  // === Рендер маркера ===
   const renderMarker = (feature: any) => {
     const blackoutData = feature.properties.blackout;
     const id = String(feature.id);
@@ -191,43 +202,20 @@ export default function YandexMap() {
     );
   };
 
-  // === Отрисовка кластера ===
+  // === Рендер кластера ===
   const renderCluster = (coordinates: [number, number], features: any[]) => {
     const handleClusterClick = () => {
       if (!mapRef.current) return;
       const map = mapRef.current;
       const currentZoom = map.zoom || 13;
-
-      // Приближаем карту к кластеру (но не выше 20)
       map.update({
-        location: {
-          center: coordinates,
-          zoom: Math.min(currentZoom + 2, 20),
-        },
-        duration: 300, // плавная анимация
+        location: { center: coordinates, zoom: Math.min(currentZoom + 2, 20) },
+        duration: 300,
       });
     };
     return (
       <YMapMarker coordinates={coordinates} onClick={handleClusterClick}>
-        <div
-          style={{
-            background: "#ff8b46",
-            padding: 0,
-            margin: 0,
-            border: "1px solid #fff",
-            borderRadius: "50%",
-            color: "#fff",
-            width: 32,
-            height: 32,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
-          {features.length}
-        </div>
+        <div className={style.cluster}>{features.length}</div>
       </YMapMarker>
     );
   };
@@ -247,33 +235,26 @@ export default function YandexMap() {
       <YMap location={LOCATION} zoomRange={{ min: 12, max: 20 }} ref={mapRef}>
         <YMapDefaultSchemeLayer />
         <YMapDefaultFeaturesLayer />
-
-        {/* === КЛАСТЕРИЗАЦИЯ === */}
         <YMapClusterer
           marker={renderMarker}
           cluster={renderCluster}
           method={clusterByGrid({ gridSize: 64 })}
           features={features}
         />
-
-        {/* --- Панель управления --- */}
         <YMapControls position="top right">
           <YMapControl>
             {typeof window !== "undefined" && window.innerWidth > 768 && (
               <button onClick={toggleFullscreen} title="Полный экран">
-                <img src="/file.svg" alt="file" />
                 {isFullscreen ? "⤡" : "⤢"}
               </button>
             )}
           </YMapControl>
         </YMapControls>
-
         <YMapControls position="left">
           {typeof window !== "undefined" && window.innerWidth > 768 && (
             <YMapZoomControl />
           )}
         </YMapControls>
-
         <YMapListener onClick={onMapClick} />
       </YMap>
     </div>

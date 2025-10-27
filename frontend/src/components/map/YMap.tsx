@@ -154,8 +154,10 @@ export default function YandexMap() {
     //Ошибка загрузки карты
     return (
       <div className={`${style.map} ${style.loadingContainer}`}>
-        <div className={`${style.lable}`}>
-          <p>Произошла ошибка во время загрузки карты</p>
+        <div className={`${style.textContainer}`}>
+          <div className={`${style.lable}`}>
+            <p>Произошла ошибка во время загрузки карты</p>
+          </div>
         </div>
       </div>
     );
@@ -163,17 +165,12 @@ export default function YandexMap() {
   if (isLoading)
     return (
       <div className={`${style.map} ${style.loadingContainer}`}>
-        <div className={style.loader}></div>
-        <div className={`${style.lable}`}>
-          <p>Загрузка карты</p>
+        <div className={`${style.textContainer}`}>
+          <div className={style.loader}></div>
+          <div className={`${style.lable}`}>
+            <p>Загрузка карты</p>
+          </div>
         </div>
-      </div>
-    );
-  if (!mapComponents || !markerComponent || !zoomControl || !clusterer)
-    return (
-      <div className={`${style.map} ${style.loadingContainer}`}>
-        <div className={style.loader}></div>
-        <p>Инициализация карты...</p>
       </div>
     );
 

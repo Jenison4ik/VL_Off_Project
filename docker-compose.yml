@@ -37,7 +37,7 @@ services:
       dockerfile: Dockerfile
     container_name: nginx_proxy
     ports:
-      - "80:80" # внешний порт
+      - "80:80"
     depends_on:
       - frontend
       - backend

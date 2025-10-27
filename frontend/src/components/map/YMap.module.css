@@ -15,7 +15,7 @@
   justify-content: center;
   height: 500px; /* чтобы совпадало с картой */
   /* background-color: #f3f3f3; */
-  background: url("/blured_map.jpg") center/cover no-repeat;
+  background: url("/mini-map.jpeg") center/cover no-repeat;
   color: #444;
   font-size: 16px;
   position: relative;

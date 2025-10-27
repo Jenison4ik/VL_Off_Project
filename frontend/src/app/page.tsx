@@ -4,10 +4,19 @@ import styles from "./page.module.css";
 import YMap from "../components/map/YMap";
 import { MockInitializer } from "@/components/MockInitializer";
 
+export async function generateMetadata() {
+  return {
+    title: {
+      default: "VL Off Отключения",
+      template: "%s || VL Off Отключения",
+    },
+  };
+}
+
 export default async function Home() {
   return (
     <>
-      <h1>Привет</h1>
+      <h1>Отключения воды и света Владивосток</h1>
       <MockInitializer>
         <YMap />
       </MockInitializer>

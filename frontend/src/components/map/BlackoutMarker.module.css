@@ -1,0 +1,11 @@
+.link {
+  color: #3f3fff;
+  text-decoration: underline;
+  transition: all 0.2s ease-out;
+}
+.link:hover {
+  color: #9292fd;
+}
+.link:visited {
+  color: #3f3fff;
+}

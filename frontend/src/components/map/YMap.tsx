@@ -1,9 +1,9 @@
 "use client";
-
+//Стоило бы сделать декомпозицию
 import { useEffect, useRef, useState, useCallback } from "react";
-import { initReactify } from "../../services/initYandexMap";
+import { initReactify } from "@/services/initYandexMap";
 import type { YMapLocationRequest } from "ymaps3";
-import style from "@/app/YMap.module.css";
+import style from "@/components/map/YMap.module.css";
 import BlackoutMarker from "@/components/map/BlackoutMarker";
 import { BlackoutByBuilding } from "@/types/Blackout";
 import getBlackouts from "@/services/getBlackouts";
@@ -150,12 +150,23 @@ export default function YandexMap() {
   }, [recordInteraction]);
 
   // === Состояния ===
-  if (error) return <div className={style.map}>Ошибка: {error}</div>;
+  if (error) {
+    //Ошибка загрузки карты
+    return (
+      <div className={`${style.map} ${style.loadingContainer}`}>
+        <div className={`${style.lable}`}>
+          <p>Произошла ошибка во время загрузки карты</p>
+        </div>
+      </div>
+    );
+  }
   if (isLoading)
     return (
       <div className={`${style.map} ${style.loadingContainer}`}>
         <div className={style.loader}></div>
-        <p>Загрузка карты...</p>
+        <div className={`${style.lable}`}>
+          <p>Загрузка карты</p>
+        </div>
       </div>
     );
   if (!mapComponents || !markerComponent || !zoomControl || !clusterer)

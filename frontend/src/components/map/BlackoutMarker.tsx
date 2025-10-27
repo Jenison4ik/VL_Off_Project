@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { mixColors } from "@/utils/colorUtils";
 import type { BlackoutByBuilding } from "@/types/Blackout";
-
+import style from "@/components/map/BlackoutMarker.module.css";
 /**
  * Тип событий для emitter'а маркеров.
  */
@@ -142,6 +142,9 @@ export default function BlackoutMarker({
       {blackoutDescriptionElements.map((el, i) => (
         <p key={`desc-${i}`}>{el}</p>
       ))}
+      <a href={`/addresses/${data.build_id}`} className={`${style.link}`}>
+        {data.address}
+      </a>
     </div>
   );
 

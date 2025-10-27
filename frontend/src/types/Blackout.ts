@@ -1,5 +1,5 @@
 export interface Blackout {
-  buildings: [{ coordinates: [string, string] }];
+  buildings: [{ coordinates: [string, string]; address: string }];
   blackout: {
     start: string;
     description: string;

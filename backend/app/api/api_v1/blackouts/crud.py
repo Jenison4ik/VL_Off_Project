@@ -8,8 +8,9 @@ from .schemas import *
 
 async def get_all_blackouts(
     session: AsyncSession,
-    target_date: str = "2018-11-29"
+    date: str = "2018-11-29 00:00:00"
 ):
+    target_date, target_time = date.split()
     subquery = (
         select(Blackout.id)
         .join(Blackout.buildings)
@@ -21,10 +22,10 @@ async def get_all_blackouts(
                 Blackout.start_date.like(f"{target_date}%"),
                 # началось раньше и еще не закончилось
                 and_(
-                    Blackout.start_date <= target_date,
+                    Blackout.start_date <= date,
                     or_(
                         Blackout.end_date.is_(None),
-                        Blackout.end_date >= target_date
+                        Blackout.end_date >= date
                     )
                 )
             )
@@ -74,8 +75,9 @@ async def get_all_blackouts(
 async def get_building_with_blackouts_by_id(
     session: AsyncSession, 
     building_id: str,
-    target_date: str = '2018-11-29'
+    date: str = "2018-11-29 00:00:00"
 ):
+    target_date, target_time = date.split()
     stmt = (
         select(Blackout)
         .join(Blackout.buildings)
@@ -86,10 +88,10 @@ async def get_building_with_blackouts_by_id(
                 Blackout.start_date.like(f"{target_date}%"),
                 # начались раньше и еще не закончились
                 and_(
-                    Blackout.start_date <= target_date,
+                    Blackout.start_date <= date,
                     or_(
                         Blackout.end_date.is_(None),
-                        Blackout.end_date >= target_date
+                        Blackout.end_date >= date
                     )
                 )
             )

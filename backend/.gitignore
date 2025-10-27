@@ -12,7 +12,8 @@ __pycache__/
 .vscode/*
 
 # dev-databases
-blackouts.db
+*.db
+*.sqlite
 
 # test-file
 _test.*

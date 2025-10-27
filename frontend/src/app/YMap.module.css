@@ -53,3 +53,18 @@
   font-weight: bold;
   cursor: pointer;
 }
+.lable {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 15px;
+  color: #ffffff;
+  font-weight: bold;
+  background: rgba(255, 233, 160, 1);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 233, 160, 1),
+    rgba(239, 113, 22, 1)
+  );
+  border-radius: 10px;
+}

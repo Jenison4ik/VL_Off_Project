@@ -150,7 +150,14 @@ export default function YandexMap() {
   }, [recordInteraction]);
 
   // === Состояния ===
-  if (error) return <div className={style.map}>Ошибка: {error}</div>;
+  if (error) {
+    //Ошибка загрузки карты
+    return (
+      <div className={`${style.map} ${style.loadingContainer}`}>
+        <p>Произошла ошибка во время загрузки карты</p>
+      </div>
+    );
+  }
   if (isLoading)
     return (
       <div className={`${style.map} ${style.loadingContainer}`}>

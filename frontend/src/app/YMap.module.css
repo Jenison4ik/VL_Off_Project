@@ -14,7 +14,8 @@
   align-items: center;
   justify-content: center;
   height: 500px; /* чтобы совпадало с картой */
-  background-color: #f3f3f3;
+  /* background-color: #f3f3f3; */
+  background: url("/blured_map.jpg") center/cover no-repeat;
   color: #444;
   font-size: 16px;
   position: relative;
@@ -26,7 +27,7 @@
   width: 48px;
   height: 48px;
   border: 4px solid rgba(0, 0, 0, 0.1);
-  border-top-color: #0078ff;
+  border-top-color: #ff6a00;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 10px;

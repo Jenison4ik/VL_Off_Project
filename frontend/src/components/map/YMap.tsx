@@ -1,9 +1,9 @@
 "use client";
 //Стоило бы сделать декомпозицию
 import { useEffect, useRef, useState, useCallback } from "react";
-import { initReactify } from "../../services/initYandexMap";
+import { initReactify } from "@/services/initYandexMap";
 import type { YMapLocationRequest } from "ymaps3";
-import style from "@/app/YMap.module.css";
+import style from "@/components/map/YMap.module.css";
 import BlackoutMarker from "@/components/map/BlackoutMarker";
 import { BlackoutByBuilding } from "@/types/Blackout";
 import getBlackouts from "@/services/getBlackouts";
@@ -95,9 +95,7 @@ export default function YandexMap() {
 
     const loadData = async () => {
       const data = await getBlackouts();
-      console.log(data);
       if (!mounted) return;
-      console.log(convertBlackouts(data)); // ###################
       setBlackouts(convertBlackouts(data));
     };
 

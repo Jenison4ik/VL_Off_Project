@@ -60,11 +60,11 @@
   padding: 10px 15px;
   color: #ffffff;
   font-weight: bold;
-  background: rgba(255, 233, 160, 1);
-  background: linear-gradient(
+  background: rgb(255, 128, 8);
+  /* background: linear-gradient(
     135deg,
     rgba(255, 233, 160, 1),
     rgba(239, 113, 22, 1)
-  );
+  ); */
   border-radius: 10px;
 }

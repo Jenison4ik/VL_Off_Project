@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseModel, PostgresDsn
-
+from redis.asyncio import Redis
 
 class ApiV1Prefix(BaseModel):
     prefix: str = '/v1'
@@ -8,6 +8,26 @@ class ApiV1Prefix(BaseModel):
 
 class ApiPrefix(BaseModel):
     v1: ApiV1Prefix = ApiV1Prefix() 
+
+
+
+class RedisDB(BaseModel):
+    cache: int = 0
+
+
+class RedisConfi(BaseModel):
+    host: str = 'localhost'
+    port: int = 6379
+    db: RedisDB = RedisDB()
+
+
+class CacheNamespace(BaseModel):
+    blackouts_list: str = 'blackouts-list'
+
+
+class CacheConfig(BaseModel):
+    prefix: str = 'fastapi-cache'
+    namespace: CacheNamespace = CacheNamespace()
 
 
 class DatabaseConfig(BaseModel):
@@ -26,6 +46,9 @@ class Settings(BaseSettings):
     )
     api: ApiPrefix = ApiPrefix()
     db: DatabaseConfig
+    redis: RedisConfi = RedisConfi()
+    cache: CacheConfig = CacheConfig()
+
     
 
 settings = Settings()

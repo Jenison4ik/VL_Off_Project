@@ -1,6 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi_cache.decorator import cache
 
 from core.models.db_helper import db_helper
 from .crud import get_all_blackouts, get_building_with_blackouts_by_id
@@ -13,8 +14,8 @@ router = APIRouter(
     tags=["Blackouts"]
 )
 
-
 @router.get('')
+@cache(expire=60)
 async def get_blackouts(
     session: Annotated[AsyncSession, Depends(db_helper.async_session_getter)]
 ) -> list[BlackoutWithBuildingsSchema]:

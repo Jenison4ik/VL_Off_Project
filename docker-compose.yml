@@ -31,6 +31,13 @@ services:
     volumes:
       - ./backend:/app
 
+  redis:
+    image: redis:8-alpine
+    ports:
+      - "6379:6379"
+    container_name: redis
+
+
   nginx:
     build:
       context: ./nginx

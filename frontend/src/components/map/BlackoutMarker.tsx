@@ -142,7 +142,7 @@ export default function BlackoutMarker({
       {blackoutDescriptionElements.map((el, i) => (
         <p key={`desc-${i}`}>{el}</p>
       ))}
-      <a href={`/addresses/${data.build_id}`} className={`${style.link}`}>
+      <a href={`/address/${data.build_id}`} className={`${style.link}`}>
         {data.address}
       </a>
     </div>

@@ -13,8 +13,7 @@ from core.config import settings
 async def lifespan(app: FastAPI):
     redis = Redis(
         host=settings.redis.host,
-        port=settings.redis.port,
-        db=settings.redis.db
+        port=settings.redis.port
     )
     FastAPICache.init(RedisBackend(redis), prefix=settings.cache.prefix)
     yield

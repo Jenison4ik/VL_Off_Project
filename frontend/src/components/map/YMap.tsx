@@ -8,6 +8,8 @@ import BlackoutMarker from "@/components/map/BlackoutMarker";
 import { BlackoutByBuilding } from "@/types/Blackout";
 import getBlackouts from "@/services/getBlackouts";
 import convertBlackouts from "@/utils/convertBlackouts";
+import MapLoading from "@/components/map/MapLoading";
+import MapError from "@/components/map/MapError";
 
 type Evt = { type: "closeAll" } | { type: "closeExcept"; id: string };
 
@@ -151,28 +153,11 @@ export default function YandexMap() {
 
   // === Состояния ===
   if (error) {
-    //Ошибка загрузки карты
-    return (
-      <div className={`${style.map} ${style.loadingContainer}`}>
-        <div className={`${style.textContainer}`}>
-          <div className={`${style.lable}`}>
-            <p>Произошла ошибка во время загрузки карты</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <MapError />;
   }
-  if (isLoading)
-    return (
-      <div className={`${style.map} ${style.loadingContainer}`}>
-        <div className={`${style.textContainer}`}>
-          <div className={style.loader}></div>
-          <div className={`${style.lable}`}>
-            <p>Загрузка карты</p>
-          </div>
-        </div>
-      </div>
-    );
+  if (isLoading) {
+    return <MapLoading />;
+  }
 
   // === Извлекаем компоненты карты ===
   const {

@@ -19,3 +19,14 @@ export interface BlackoutByBuilding {
     description: string;
   }[];
 }
+export interface BlackoutByID {
+  blackouts: {
+    id: string;
+    start: string;
+    end: string;
+    description: string;
+    type: "electricity" | "cold_water" | "hot_water" | "heat";
+    initiator_name: string;
+  }[];
+  address: string;
+}

@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 @router.get('', response_model=list[BlackoutWithBuildingsSchema])
-@cache(expire=300, key_builder=blackouts_key_builder)
+@cache(expire=300, key_builder=blackouts_key_builder, namespace=settings.cache.namespace.blackouts_list)
 async def get_blackouts(
     blackouts_list: Annotated[list[BlackoutWithBuildingsSchema], Depends(get_blackouts_list)]
 ):
@@ -25,7 +25,7 @@ async def get_blackouts(
     
 
 @router.get('/{building_id}', response_model=BlackoutsForBuildingSchema)
-@cache(expire=300, key_builder=blackouts_key_builder)
+@cache(expire=300, key_builder=blackouts_key_builder, namespace=settings.cache.namespace.blackout_building)
 async def get_building_blackouts_by_id(
     session: Annotated[AsyncSession, Depends(db_helper.async_session_getter)],
     building_id: str

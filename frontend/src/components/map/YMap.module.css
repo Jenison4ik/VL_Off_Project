@@ -9,10 +9,6 @@
 
 /* Центрированный блок загрузки */
 .loadingContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   height: 500px; /* чтобы совпадало с картой */
   /* background-color: #f3f3f3; */
   background: url("/mini-map.jpeg") center/cover no-repeat;
@@ -67,4 +63,14 @@
     rgba(239, 113, 22, 1)
   ); */
   border-radius: 10px;
+}
+.textContainer {
+  min-width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
 }

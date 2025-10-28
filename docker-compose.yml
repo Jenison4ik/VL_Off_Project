@@ -30,13 +30,18 @@ services:
     restart: unless-stopped
     volumes:
       - ./backend:/app
+    depends_on:
+      - redis
 
   redis:
     image: redis:8-alpine
     ports:
       - "6379:6379"
     container_name: redis
-
+    networks:
+      - app_network  
+    restart: unless-stopped
+  
 
   nginx:
     build:

@@ -16,7 +16,7 @@ class RedisDB(BaseModel):
 
 
 class RedisConfi(BaseModel):
-    host: str = 'localhost'
+    host: str = 'redis'
     port: int = 6379
     db: RedisDB = RedisDB()
 

@@ -9,7 +9,7 @@ services:
     environment:
       - NODE_ENV=production
     expose:
-      - "3000" # доступен только внутри сети Docker
+      - "3000"
     networks:
       - app_network
     restart: unless-stopped
@@ -20,16 +20,16 @@ services:
       dockerfile: Dockerfile
     container_name: fastapi_backend
     ports:
-      - "8000:8000" # теперь доступен с localhost
+      - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
     working_dir: /app/app
     command: uvicorn main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - ./backend:/app
     networks:
       - app_network
     restart: unless-stopped
-    volumes:
-      - ./backend:/app
     depends_on:
       - redis
 
@@ -53,14 +53,15 @@ services:
     environment:
       - NGINX_DOMAIN=jenison.ru
     volumes:
-      - ./nginx/certs/conf:/etc/letsencrypt # Сертификаты Let's Encrypt
-      - ./nginx/certs/www:/var/www/certbot # Временная папка для проверки домена
+      - ./nginx/certs/conf:/etc/letsencrypt
+      - ./nginx/certs/www:/var/www/certbot
     depends_on:
       - frontend
       - backend
     networks:
       - app_network
     restart: unless-stopped
+
   certbot:
     image: certbot/certbot
     container_name: certbot
@@ -70,7 +71,6 @@ services:
     entrypoint: >
       /bin/sh -c "trap exit TERM; while :; do
         certbot renew --webroot -w /var/www/certbot;
-        docker exec nginx_proxy nginx -s reload;
         sleep 12h;
       done"
     depends_on:
@@ -78,7 +78,6 @@ services:
     networks:
       - app_network
 
-# 🔹 Определяем локальную сеть
 networks:
   app_network:
     driver: bridge

@@ -182,11 +182,13 @@ async def search_addresses(
 
     filtered_rows.sort(key=lambda r: (extract_sort_key(r.number), r.number))
 
-    ans = [
-        AddressSuggestionSchema(
-            full_address=f"{r.name}, {r.number}",
-            building_id=r.id
-        )
-        for r in filtered_rows[:limit]
-    ]
+    ans = []
+
+    for r in filtered_rows[:limit]:
+        if r.number:
+           ans.append(AddressSuggestionSchema(
+                full_address=f"{r.name}, {r.number}",
+                building_id=r.id
+            )) 
+    
     return ans

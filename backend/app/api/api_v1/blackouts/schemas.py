@@ -44,3 +44,13 @@ class BlackoutsForBuildingSchema(BaseModel):
 
     class Config:
         from_attributes = True
+        
+        
+        
+
+class AddressSuggestionSchema(BaseModel):
+    full_address: str = Field(..., description="Полный адрес в формате 'улица, дом'")
+    building_id: str = Field(..., description="ID здания")
+
+    class Config:
+        from_attributes = True

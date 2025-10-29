@@ -19,7 +19,7 @@ export default function PrefereAddress({ id }: { id: string }) {
       document.cookie = `id=${id}; path=/; max-age=${maxAge}; SameSite=Lax;`; //Добавить  Secure
       setIsFavorite(true);
     } else {
-      document.cookie = `id=; path=/; max-age=0; SameSite=Lax; Secure`;
+      document.cookie = `id=; path=/; max-age=0; SameSite=Lax; `; //И сюда тоже Secure
       setIsFavorite(false);
     }
   }

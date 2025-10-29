@@ -21,7 +21,7 @@ function useSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
-  const debouncedQuery = useDeounce(query, 0);
+  const debouncedQuery = useDeounce(query, 200);
 
   useEffect(() => {
     let isCancelled = false;

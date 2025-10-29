@@ -17,8 +17,14 @@ function useSearch() {
   useEffect(() => {
     let isCancelled = false;
     async function run() {
-      const len = query.trim().length;
-      if (!query || len < 3 || len % 3 !== 0) {
+      const val = query.trim();
+      const len = val.length;
+      console.log(lastRequestedLenRef.current, "   ", len);
+      if (
+        (!query || len < 3 || len % 3 !== 0) &&
+        val[len - 1]?.toLowerCase() !== val[len - 1]?.toUpperCase() &&
+        lastRequestedLenRef.current + 3 > len
+      ) {
         return; // не запрашиваем, оставляем предыдущие результаты
       }
       if (lastRequestedLenRef.current === len) {

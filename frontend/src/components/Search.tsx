@@ -4,15 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import style from "./Search.module.scss";
 
-function useDeounce<T>(value: T, delay = 500): T {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-  return debouncedValue;
-}
-
 function useSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<
@@ -21,22 +12,25 @@ function useSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
-  const debouncedQuery = useDeounce(query, 200);
+  const lastRequestedLenRef = useRef<number>(0);
 
   useEffect(() => {
     let isCancelled = false;
     async function run() {
-      if (!debouncedQuery || debouncedQuery.trim().length < 2) {
-        setResults([]);
-        setActiveIndex(-1);
-        return;
+      const len = query.trim().length;
+      if (!query || len < 3 || len % 3 !== 0) {
+        return; // не запрашиваем, оставляем предыдущие результаты
+      }
+      if (lastRequestedLenRef.current === len) {
+        return; // уже запрашивали на этой длине
       }
       setIsLoading(true);
       try {
-        const data = await searchAddress(debouncedQuery.trim());
+        const data = await searchAddress(query.trim());
         if (!isCancelled) {
           setResults(data ?? []);
           setActiveIndex(data && data.length > 0 ? 0 : -1);
+          lastRequestedLenRef.current = len;
         }
       } finally {
         if (!isCancelled) setIsLoading(false);
@@ -46,7 +40,7 @@ function useSearch() {
     return () => {
       isCancelled = true;
     };
-  }, [debouncedQuery]);
+  }, [query]);
 
   return {
     query,
@@ -107,11 +101,6 @@ export default function Search() {
           router.push(`/address/${res[0].building_id}`);
         }
       });
-      if (activeIndex >= 0 && activeIndex < results.length) {
-        const picked = results[activeIndex];
-        router.push(`/address/${picked.building_id}`);
-        setIsOpen(false);
-      }
     }
   }
 
@@ -139,7 +128,7 @@ export default function Search() {
       {isOpen && (
         <div className={style.dropdown}>
           {isLoading && <div className={style.loading}>Загрузка…</div>}
-          {!isLoading && results.length === 0 && query.trim().length >= 2 && (
+          {!isLoading && results.length === 0 && query.trim().length >= 3 && (
             <div className={style.empty}>Ничего не найдено</div>
           )}
           {!isLoading &&

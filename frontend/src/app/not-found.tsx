@@ -1,15 +1,10 @@
 import Image from "next/image";
+import Bird from "../../public/not-found.png";
 
-export default async function NotFound() {
+export default function NotFound() {
   return (
     <div>
-      <Image
-        src="/not-found.png"
-        width="100"
-        height="200"
-        alt="чайка"
-        quality={100}
-      ></Image>
+      <Image src={Bird} alt="чайка" />
     </div>
   );
 }

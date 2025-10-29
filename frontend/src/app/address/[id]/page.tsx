@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { initMocksServer } from "@/mocks/server";
 import { BlackoutByID } from "@/types/Blackout";
 import type { Metadata, ResolvingMetadata } from "next";
-import PrefereAddress from "@/components/PreferAddress";
+import PrefereAddress from "@/components/PreferAddressBtn";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -74,7 +74,6 @@ export default async function BlackoutPage({
     ]);
     return (
       <div>
-        <p>vdfvs</p>
         <h1>
           <span className="address">{info.address}</span> Отключения
         </h1>

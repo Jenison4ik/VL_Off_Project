@@ -49,6 +49,9 @@ services:
     container_name: nginx_proxy
     ports:
       - "80:80"
+      - "443:443"
+    environment:
+      - NGINX_DOMAIN=jenison.ru
     volumes:
       - ./nginx/certs/conf:/etc/letsencrypt # Сертификаты Let's Encrypt
       - ./nginx/certs/www:/var/www/certbot # Временная папка для проверки домена

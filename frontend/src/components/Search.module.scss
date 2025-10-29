@@ -1,0 +1,48 @@
+.searchContainer {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+}
+
+.input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #eee;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.item {
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.item:hover,
+.itemActive {
+  background: #f5f7fb;
+}
+
+.empty {
+  padding: 10px 12px;
+  color: #8b8b8b;
+}
+
+.loading {
+  padding: 10px 12px;
+  color: #8b8b8b;
+}

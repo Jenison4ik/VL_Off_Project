@@ -102,6 +102,11 @@ export default function Search() {
       setActiveIndex((prev) => (prev - 1 + results.length) % results.length);
     } else if (e.key === "Enter") {
       e.preventDefault();
+      searchAddress(query.trim()).then((res) => {
+        if (res[0]) {
+          router.push(`/address/${res[0].building_id}`);
+        }
+      });
       if (activeIndex >= 0 && activeIndex < results.length) {
         const picked = results[activeIndex];
         router.push(`/address/${picked.building_id}`);

@@ -5,7 +5,7 @@ export default function getServerUrl() {
 
   if (isServer) {
     if (process.env.NODE_ENV === "development") {
-      baseUrl = "http://localhost:3000";
+      baseUrl = "localhost:3000";
     } else {
       baseUrl = process.env.NEXT_PUBLIC_HOST_NAME as string;
       if (!baseUrl) {

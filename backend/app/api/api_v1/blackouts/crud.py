@@ -13,6 +13,11 @@ async def get_all_blackouts(
     session: AsyncSession,
     date: str = "2018-11-29 00:00:00"
 ):
+    '''
+    полуение всех отключений и адресов, 
+    которые они затронули и нормализация через
+    pydantic схему 
+    '''
     target_date, target_time = date.split()
     subquery = (
         select(Blackout.id)
@@ -71,7 +76,6 @@ async def get_all_blackouts(
         
     json_data = [item.model_dump() for item in data]
 
-    print(len(json_data))
     return json_data
 
 
@@ -80,16 +84,20 @@ async def get_building_with_blackouts_by_id(
     building_id: str,
     date: str = "2018-11-29 00:00:00"
 ):
+    '''
+    получение здания и всех отключений в нём по id.
+    если отключений нет, возвращается только адрес 
+    '''
     target_date, target_time = date.split()
+
+    # ищем отключения
     stmt = (
         select(Blackout)
         .join(Blackout.buildings)
         .where(
             Building.id == building_id,
             or_(
-                # начались именно в этот день
                 Blackout.start_date.like(f"{target_date}%"),
-                # начались раньше и еще не закончились
                 and_(
                     Blackout.start_date <= date,
                     or_(
@@ -99,46 +107,43 @@ async def get_building_with_blackouts_by_id(
                 )
             )
         )
-        .options(
-            # подгружаем здания и улицы, чтобы собрать адрес
-            selectinload(Blackout.buildings).joinedload(Building.street)
-        )
     )
 
     result = await session.execute(stmt)
     blackouts = result.scalars().unique().all()
 
     blackouts_list: List[BlackoutSchema] = []
-    address: Optional[str] = None
 
     for b in blackouts:
-        bo = BlackoutSchema(
-            id=str(b.id),
-            start=b.start_date,
-            end=b.end_date,
-            description=b.description,
-            type=b.type,
-            initiator_name=getattr(b, "initiator_name", None),
+        blackouts_list.append(
+            BlackoutSchema(
+                id=str(b.id),
+                start=b.start_date,
+                end=b.end_date,
+                description=b.description,
+                type=b.type,
+                initiator_name=getattr(b, "initiator_name", None),
+            )
         )
-        blackouts_list.append(bo)
 
+    # если нет отключений, получаем только адрес
+    address_stmt = (
+        select(Street.name, Building.number)
+        .join(Street, Street.id == Building.street_id, isouter=True)
+        .where(Building.id == building_id)
+    )
+    address_result = await session.execute(address_stmt)
+    street_name, building_number = address_result.one_or_none() or (None, None)
 
-        if address is None: 
-            for build in b.buildings:
-                if str(build.id) != building_id:
-                    continue
-
-                coords = normalize_coordinates(build.coordinates)
-                street = build.street.name if build.street else None
-                if coords and street:
-                    address = f"{street} {build.number}"
-                    break
+    address = None
+    if street_name:
+        address = f"{street_name} {building_number}"
 
     result_schema = BlackoutsForBuildingSchema(
         blackouts=blackouts_list,
         address=address
     )
-    
+
     return result_schema.model_dump()
 
 
@@ -148,7 +153,10 @@ async def search_addresses(
     query: str, limit: 
         int = 100
 ):
-    print(query)
+    '''
+    "гибкий" поиск по адресам. Возвращает максимально
+    похожие на текстовый запрос пользователя адреса
+    '''
     query = query.strip().lower()
     if not query:
         return []

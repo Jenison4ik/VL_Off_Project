@@ -7,7 +7,7 @@ RUN apk add --no-cache gettext
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Копируем твой nginx.conf
-COPY nginx.conf /etc/nginx/nginx.conf.template
+COPY nginx.conf /etc/nginx/start-ssl.conf
 
 # Создаём папку под логи
 RUN mkdir -p /var/log/nginx

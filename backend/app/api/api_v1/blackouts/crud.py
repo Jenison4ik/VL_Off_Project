@@ -1,9 +1,12 @@
+import re
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, joinedload
-from sqlalchemy import select, and_, or_
+from sqlalchemy import select, and_, or_, func
+from rapidfuzz import fuzz, process
 
-from utils.regexp import normalize_coordinates
-from core.models import Blackout, Building
+from utils.regexp import normalize_coordinates, normalize_address
+from utils.filters import address_fuzzy_search
+from core.models import Blackout, Building, Street
 from .schemas import *
 
 async def get_all_blackouts(
@@ -137,3 +140,45 @@ async def get_building_with_blackouts_by_id(
     )
     
     return result_schema.model_dump()
+
+
+
+async def search_addresses(
+    session: AsyncSession, 
+    query: str, limit: 
+        int = 100
+):
+    print(query)
+    query = query.strip().lower()
+    if not query:
+        return []
+
+    # приводим адрес к нормальному виду
+    street_part, number_part = normalize_address(query)
+
+    # запросим все улицы + здания (или ограничим первые N улиц)
+    stmt = (
+        select(Street.name, Building.number, Building.id)
+        .join(Building, Building.street_id == Street.id)
+    )
+    result = await session.execute(stmt)
+    rows = result.all()
+
+    # гибкий поиск в адресах
+    filtered_rows = address_fuzzy_search(rows=rows, street_part=street_part, number_part=number_part)
+
+    # сортируем по числу в номере
+    def extract_sort_key(num: str):
+        m = re.search(r"\d+", num or "")
+        return int(m.group()) if m else 0
+
+    filtered_rows.sort(key=lambda r: (extract_sort_key(r.number), r.number))
+
+    ans = [
+        AddressSuggestionSchema(
+            full_address=f"{r.name}, {r.number}",
+            building_id=r.id
+        )
+        for r in filtered_rows[:limit]
+    ]
+    return ans

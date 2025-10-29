@@ -8,7 +8,7 @@ RUN rm /etc/nginx/conf.d/default.conf
 
 # Копируем оба конфига
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY startssl.conf /etc/nginx/start-ssl.conf
+COPY start-ssl.conf /etc/nginx/start-ssl.conf
 
 # Создаём папку под логи и для Certbot
 RUN mkdir -p /var/log/nginx /var/www/certbot /etc/letsencrypt

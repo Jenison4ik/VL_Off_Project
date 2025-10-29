@@ -40,5 +40,5 @@ async def get_similar_addresses(
     q: str,
     session: Annotated[AsyncSession, Depends(db_helper.async_session_getter)],
 ):
-    addresses = await search_addresses(session=session, query=q)
+    addresses = await search_addresses(session=session, query=q, limit=4)
     return addresses

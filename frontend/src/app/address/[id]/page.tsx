@@ -2,7 +2,6 @@
 import getBlackoutsByID from "@/services/getBlackoutsByID";
 import { notFound } from "next/navigation";
 import { initMocksServer } from "@/mocks/server";
-import { BlackoutByID } from "@/types/Blackout";
 import type { Metadata, ResolvingMetadata } from "next";
 import PrefereAddress from "@/components/PreferAddressBtn";
 
@@ -18,6 +17,7 @@ export async function generateMetadata(
   const { id } = await params;
 
   try {
+    initMocksServer();
     const info = await getBlackoutsByID(id);
 
     // Создаем описание на основе типов отключений

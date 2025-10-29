@@ -5,6 +5,7 @@ import YMap from "../components/map/YMap";
 import { MockInitializer } from "@/components/MockInitializer";
 import PreferAddressLink from "@/components/PreferAddsressLink";
 import { initMocksServer } from "@/mocks/server";
+import Search from "@/components/Search";
 
 export async function generateMetadata() {
   return {
@@ -20,6 +21,7 @@ export default async function Home() {
     <>
       <h1>Отключения воды и света Владивосток</h1>
       <MockInitializer>
+        <Search />
         <YMap />
         <PreferAddressLink />
       </MockInitializer>

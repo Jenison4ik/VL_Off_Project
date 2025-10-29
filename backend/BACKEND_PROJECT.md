@@ -77,7 +77,7 @@ app/
 
 ### 3.1. ER-диаграмма базы данных
 
-## [ссылка на диаграму базы данных](https://drive.google.com/u/0/drive-viewer/AKGpihY6MKX_yW-GiSiB78tUdYHuQvMSCvWRIaTAjdH5wQdCNxjUG9_IFmqy43EosKGqcmyJBI4zMDjmxPGdLmpkyuUvvy7_tO--cMs=s1600-rw-v1)
+## [ссылка на диаграму базы данных](https://drive.google.com/file/d/1iT7aMqjBba9qrZ3RdFetMKcgEgX2t5OY/view?usp=sharing)
 
 **Описание основных таблиц:**
 - **blackouts** — информация об отключениях (тип, даты, описание, инициатор)
@@ -99,4 +99,4 @@ app/
 # ОЧЕНЬ ВАЖНО!
 - ## Запуск fastapi приложения отдельно от других модулей проекта происходит из папки `./backend/app`. В противном случае import модулей будет работать некорректно. [ссылка на скачивание launch.json для vscode, если не удаётся запустить](https://drive.google.com/file/d/1xGUZZ8CnAy2rpmZgOotaeIloMpn0cbso/view?usp=sharing)
 
-- ## Для корректной работы запросов необходимо поместить базу данных (которая давалась в задании аналитикам) с названием `blackouts.db` в папку ./backend/app "рядом" с файлом "blackouts_database_put_here.lock" [ссылка на скачивание базы данных](https://drive.google.com/file/d/1ZqOs8VpR6CqB2Q_9gg__A_Fr70dl0vOv/view)
+- ## Для корректной работы запросов необходимо поместить базу данных (которая давалась в задании аналитикам) с названием `blackouts.db` в папку ./backend/app "рядом" с файлом "blackouts_database_put_here.lock" [ссылка на скачивание базы данных](https://drive.google.com/file/d/193MPUIhWy5sL5yQk7nRSev-IcMimn1bD/view?usp=sharing)

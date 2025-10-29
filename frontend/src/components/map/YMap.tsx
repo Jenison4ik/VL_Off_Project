@@ -241,7 +241,11 @@ export default function YandexMap() {
         <YMapControls position="top right">
           <YMapControl>
             {typeof window !== "undefined" && window.innerWidth > 768 && (
-              <button onClick={toggleFullscreen} title="Полный экран">
+              <button
+                onClick={toggleFullscreen}
+                title="Полный экран"
+                className={`${style.fullscreenbtn}`}
+              >
                 {isFullscreen ? "⤡" : "⤢"}
               </button>
             )}

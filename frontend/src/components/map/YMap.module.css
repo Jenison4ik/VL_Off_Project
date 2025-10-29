@@ -74,3 +74,21 @@
   overflow: hidden;
   backdrop-filter: blur(10px);
 }
+.fullscreenbtn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: none;
+  outline: none;
+  border: none;
+  color: #000;
+  font-size: 1rem;
+  line-height: 1rem;
+  &:hover {
+    cursor: pointer;
+  }
+}

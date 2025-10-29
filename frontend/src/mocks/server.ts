@@ -1,16 +1,12 @@
 import { setupServer } from "msw/node";
-import { handlers } from "./handlers";
-
-let server: ReturnType<typeof setupServer> | null = null;
+import { handlers } from "./handlers.js";
 
 export function initMocksServer() {
-  if (process.env.NODE_ENV !== "development") return;
-
-  if (!server) {
-    server = setupServer(...handlers);
-    server.listen({ onUnhandledRequest: "warn" });
-    console.info("[MSW] Mock Server Node запущен.");
+  if (process.env.NODE_ENV === "development") {
+    // Запускаем мок-сервер только в режиме разработки
+    setupServer(...handlers).listen({
+      onUnhandledRequest: "warn", // Логируем необработанные запросы
+    });
+    console.info("[MSW] Mock Service Worker для Node.js запущен.");
   }
-
-  return server;
 }

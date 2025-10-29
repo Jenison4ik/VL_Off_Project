@@ -1,12 +1,24 @@
 import { BlackoutByID } from "@/types/Blackout";
 import getServerUrl from "@/services/getServerUrl";
+import { cache } from "react";
 
-export default async function getBlackoutsByID(
-  id: string
-): Promise<BlackoutByID> {
+//cache, потому что вызываем и для странмцы и для metadata см. https://nextjs.org/docs/app/getting-started/metadata-and-og-images#streaming-metadata
+export default cache(async (id: string): Promise<BlackoutByID> => {
   const { baseUrl, isServer } = getServerUrl();
-
-  const data = await fetch(baseUrl + "/api/v1/blackouts/" + id);
+  let data: Response;
+  if (isServer) {
+    data = await fetch("http://" + baseUrl + "/api/v1/blackouts/" + id, {
+      redirect: "follow",
+      // контроль кэширования
+      next: { revalidate: 60 },
+    });
+  } else {
+    data = await fetch("/api/v1/blackouts/" + id, {
+      redirect: "follow",
+      // контроль кэширования
+      next: { revalidate: 60 },
+    });
+  }
   if (data.status === 404) {
     throw new Error("NOT_FOUND");
   }
@@ -15,4 +27,4 @@ export default async function getBlackoutsByID(
     throw new Error(`Ошибка сервера: ${data.status}`);
   }
   return await data.json();
-}
+});

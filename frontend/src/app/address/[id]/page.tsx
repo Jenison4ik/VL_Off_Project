@@ -2,8 +2,9 @@
 import getBlackoutsByID from "@/services/getBlackoutsByID";
 import { notFound } from "next/navigation";
 import { initMocksServer } from "@/mocks/server";
+import { BlackoutByID } from "@/types/Blackout";
 
-export default async function ProductPage({
+export default async function BlackoutPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -12,10 +13,24 @@ export default async function ProductPage({
   try {
     initMocksServer();
     const info = await getBlackoutsByID(id);
+    const typesText = new Map([
+      ["electricity", "⚡ Отключение света"],
+      ["cold_water", "❄️💧 Отключение холодной воды"],
+      ["hot_water", "🔥💧 Отключение горячей воды"],
+      ["heat", "🔥 Отключение отопления"],
+    ]);
     return (
       <div>
-        <h1>{info.address}</h1>
-        <p>{info.blackouts[0].description}</p>
+        <p>vdfvs</p>
+        <h1>
+          <span className="address">{info.address}</span> Отключения
+        </h1>
+        {info.blackouts.map((el, i) => (
+          <div key={i}>
+            <h3>{typesText.get(el.type)}</h3>
+            <p>{el.description}</p>
+          </div>
+        ))}
       </div>
     );
   } catch (error: any) {

@@ -13,6 +13,7 @@ function useSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
   const lastRequestedLenRef = useRef<number>(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     let isCancelled = false;
@@ -30,14 +31,30 @@ function useSearch() {
       if (lastRequestedLenRef.current === len) {
         return; // уже запрашивали на этой длине
       }
+
+      // Отменяем предыдущий запрос
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      // Создаем новый AbortController для текущего запроса
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+
       setIsLoading(true);
       try {
-        const data = await searchAddress(query.trim());
-        if (!isCancelled) {
+        const data = await searchAddress(query.trim(), abortController.signal);
+        if (!isCancelled && !abortController.signal.aborted) {
           setResults(data ?? []);
           setActiveIndex(data && data.length > 0 ? 0 : -1);
           lastRequestedLenRef.current = len;
         }
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+          // Запрос был отменен, ничего не делаем
+          return;
+        }
+        console.error("Search error:", error);
       } finally {
         if (!isCancelled) setIsLoading(false);
       }
@@ -45,6 +62,9 @@ function useSearch() {
     run();
     return () => {
       isCancelled = true;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
     };
   }, [query]);
 

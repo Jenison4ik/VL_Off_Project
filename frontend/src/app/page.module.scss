@@ -187,10 +187,15 @@
   text-align: start;
   width: 100%;
   font-size: 34px;
-  margin-bottom: 80px;
-  margin-top: 40px;
+  margin-bottom: 20px;
+  margin-top: 20px;
 }
 .logo {
   width: 90px;
   height: auto;
+}
+@media screen and (max-width: 768px) {
+  .title {
+    font-size: 25px;
+  }
 }

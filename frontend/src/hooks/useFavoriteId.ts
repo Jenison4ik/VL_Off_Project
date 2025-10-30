@@ -11,11 +11,11 @@ export function useFavoriteId(id: string) {
 
   const toggleFavorite = useCallback(() => {
     if (isFavorite) {
-      document.cookie = `id=; path=/; max-age=0; SameSite=Lax;`;
+      document.cookie = `id=; path=/; max-age=0; SameSite=Lax; Secure`;
       setIsFavorite(false);
     } else {
       const maxAge = 60 * 60 * 24 * 365 * 10;
-      document.cookie = `id=${id}; path=/; max-age=${maxAge}; SameSite=Lax;`;
+      document.cookie = `id=${id}; path=/; max-age=${maxAge}; SameSite=Lax; Secure`;
       setIsFavorite(true);
     }
   }, [id, isFavorite]);

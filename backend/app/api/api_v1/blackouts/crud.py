@@ -1,13 +1,15 @@
 import re
+import json
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy import select, and_, or_, func
-from rapidfuzz import fuzz, process
 
 from utils.regexp import normalize_coordinates, normalize_address
 from utils.filters import address_fuzzy_search
 from core.models import Blackout, Building, Street
 from .schemas import *
+from core.redis_client import get_redis
+from core.config import settings
 
 async def get_all_blackouts(
     session: AsyncSession,
@@ -164,14 +166,25 @@ async def search_addresses(
     # приводим адрес к нормальному виду
     street_part, number_part = normalize_address(query)
 
-    # запросим все улицы + здания (или ограничим первые N улиц)
-    stmt = (
-        select(Street.name, Building.number, Building.id)
-        .join(Building, Building.street_id == Street.id)
-    )
-    result = await session.execute(stmt)
-    rows = result.all()
-
+    redis = get_redis()
+    exists = await redis.exists(settings.cache.namespace.all_addresses)
+    if exists:
+        rows = await redis.get(settings.cache.namespace.all_addresses)
+        rows = json.loads(rows)
+    else:
+        # запросим все улицы + здания (или ограничим первые N улиц)
+        stmt = (
+            select(Street.name, Building.number, Building.id)
+            .join(Building, Building.street_id == Street.id)
+        )
+        result = await session.execute(stmt)
+        rows = result.all()
+        
+        rows = [{"name": r[0], "number": r[1], "id": r[2]} for r in rows]
+        await redis.set(settings.cache.namespace.all_addresses, json.dumps(rows, ensure_ascii=False), ex=3600)
+    
+    
+    
     # гибкий поиск в адресах
     filtered_rows = address_fuzzy_search(rows=rows, street_part=street_part, number_part=number_part)
 
@@ -180,15 +193,15 @@ async def search_addresses(
         m = re.search(r"\d+", num or "")
         return int(m.group()) if m else 0
 
-    filtered_rows.sort(key=lambda r: (extract_sort_key(r.number), r.number))
+    filtered_rows.sort(key=lambda r: (extract_sort_key(r['number']), r['number']))
 
     ans = []
 
     for r in filtered_rows[:limit]:
-        if r.number:
+        if r['number']:
            ans.append(AddressSuggestionSchema(
-                full_address=f"{r.name}, {r.number}",
-                building_id=r.id
+                full_address=f"{r['name']}, {r['number']}",
+                building_id=r['id']
             )) 
     
     return ans

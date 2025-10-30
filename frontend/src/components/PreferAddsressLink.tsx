@@ -64,21 +64,7 @@ export default function PreferAddressLink() {
 
       <div className={style.dataBlock}>
         {!hasBlackouts ? (
-          <div
-            style={{
-              width: "100%",
-              height: "150px",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: "12px",
-              backgroundColor: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              fontSize: "1.1rem",
-            }}
-          >
-            Отключений не было
-          </div>
+          <div style={{}}>Отключений не было</div>
         ) : (
           data.blackouts.map((item, index) => {
             const end = parseYmdHmsSmart(item.end);

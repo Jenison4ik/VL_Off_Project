@@ -14,10 +14,6 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
-  align-items: center;
 }
 
 body {
@@ -28,7 +24,12 @@ body {
   font-family: var(--font-manrope), Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   min-width: 100vw;
+  flex-grow: 1;
 }
 
 * {
@@ -43,7 +44,19 @@ a {
   color: inherit;
   text-decoration: none;
 }
-
+footer {
+  margin-top: 20px;
+  display: flex;
+  padding: 30px;
+  color: #505050;
+  background-color: #d0d0d0;
+  align-items: center;
+  justify-content: center;
+  min-width: 100vw;
+}
+.foot-wrap {
+  width: 60vw;
+}
 // @media (prefers-color-scheme: dark) {
 //   html {
 //     color-scheme: dark;

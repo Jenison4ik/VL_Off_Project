@@ -116,9 +116,12 @@
 .content {
   max-width: 80vw;
   min-width: 80vw;
+}
+.contenthead {
+  max-width: 80vw;
+  min-width: 80vw;
   min-height: 100%;
 }
-
 @media screen and (max-width: 768px) {
   .content {
     max-width: 90vw;
@@ -177,6 +180,7 @@
   padding: 25px;
   color: #fff;
   margin-bottom: 10px;
+  // max-height: 350px;
 }
 
 .title {

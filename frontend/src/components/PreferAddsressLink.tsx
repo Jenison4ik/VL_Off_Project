@@ -39,7 +39,7 @@ export default function PreferAddressLink() {
             <div className={`${style.item}`} key={index}>
               <p>{getBlackoutTypeLabel(item.type)}</p>
               <p>
-                — {item.description} "{item.initiator_name} приблизительно
+                — {item.description} "{item.initiator_name}" приблизительно
                 закончится -{" "}
                 {end
                   ? `${end.getDate()} ${getWordMonth(end.getMonth())} в ${end

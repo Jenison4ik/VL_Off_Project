@@ -17,7 +17,6 @@ async def init_redis():
         host=settings.redis.host,
         port=settings.redis.port,
         db=settings.redis.db.cache,
-        decode_responses=True,
     )
     FastAPICache.init(RedisBackend(redis_client), prefix=settings.cache.prefix)
     return redis_client

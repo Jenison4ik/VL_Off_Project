@@ -114,16 +114,15 @@
   }
 }
 .content {
-  max-width: 70vw;
+  max-width: 80vw;
+  min-width: 80vw;
+  min-height: 100%;
 }
-@media screen and (max-width: 1200px) {
-  .content {
-    max-width: 80vw;
-  }
-}
+
 @media screen and (max-width: 768px) {
   .content {
     max-width: 90vw;
+    min-width: 90vw;
   }
 }
 @media (max-width: 600px) {

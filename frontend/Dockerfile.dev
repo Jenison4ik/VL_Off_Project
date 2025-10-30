@@ -1,23 +1,19 @@
 # Базовый образ Node.js
 FROM node:18-alpine
 
-# Устанавливаем libc6-compat, если нужны бинарные модули
 RUN apk add --no-cache libc6-compat
 
-# Рабочая директория
 WORKDIR /app
 
-# Копируем package.json и package-lock.json
 COPY package.json package-lock.json* ./
 
-# Устанавливаем зависимости
 RUN npm ci
 
-# Копируем весь исходный код
+# Копируем код для dev
 COPY . .
 
-# Порт для разработки
+# Порт для dev
 EXPOSE 3000
 
-# Запуск в режиме разработки
+# Запуск dev-сервера
 CMD ["npm", "run", "dev"]

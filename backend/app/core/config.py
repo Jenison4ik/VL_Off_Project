@@ -24,6 +24,7 @@ class RedisConfi(BaseModel):
 class CacheNamespace(BaseModel):
     blackouts_list: str = 'blackouts-list'
     blackout_building: str = 'blackout-building'
+    all_addresses: str = 'all-addresses'
 
 
 class CacheConfig(BaseModel):

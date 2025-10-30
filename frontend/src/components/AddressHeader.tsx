@@ -20,7 +20,7 @@ export default async function AddressHeader({
         </a>
 
         <h1 className={styles.title}>
-          Коммунальные услуги по адресу <br />
+          Коммунальные отключения по адресу <br />
           {titleProp}
         </h1>
         <PreferAddress id={id} />

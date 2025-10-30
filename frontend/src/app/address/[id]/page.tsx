@@ -96,9 +96,8 @@ export default async function BlackoutPage({
                       {getBlackoutTypeLabelNoEmoji(item.type)} {"до "}
                       {formattedEnd}
                     </h3>
-                    <p className={style.description}>
-                      — {item.description} "{item.initiator_name}"
-                    </p>
+                    <p className={style.description}>— {item.description}</p>
+                    <p>"{item.initiator_name}"</p>
                   </div>
                 </div>
               );

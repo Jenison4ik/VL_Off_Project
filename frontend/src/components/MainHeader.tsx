@@ -12,7 +12,9 @@ export default function MainHeader() {
           <img src="/logo.svg" alt="VL RU" />
         </a>
 
-        <h1 className={styles.title}>Коммунальные услуги во Владивостоке</h1>
+        <h1 className={styles.title}>
+          Коммунальные отключения во Владивостоке
+        </h1>
 
         <MockInitializer>
           <Search />

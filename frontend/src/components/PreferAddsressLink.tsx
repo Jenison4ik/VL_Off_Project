@@ -5,34 +5,52 @@ import { getFavoriteIdFromCookie } from "@/utils/cookies";
 import { useEffect, useState } from "react";
 import style from "@/components/PreferAddsressLink.module.scss";
 import { BlackoutByID } from "@/types/Blackout";
-import { getBlackoutTypeLabel } from "@/utils/blackoutTypes";
+import { getBlackoutTypeLabelNoEmoji } from "@/utils/blackoutTypes";
 import { getWordMonth, parseYmdHmsSmart } from "@/utils/date";
 
 export default function PreferAddressLink() {
   const id = getFavoriteIdFromCookie();
   const [data, setData] = useState<BlackoutByID>();
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!id) return;
+
     let isMounted = true;
-    getBlackoutsByID(id).then((res) => {
-      if (isMounted) setData(res);
-    });
+
+    getBlackoutsByID(id)
+      .then((res) => {
+        if (isMounted) setData(res);
+      })
+      .catch(() => {
+        if (isMounted) setError(true);
+      });
+
     return () => {
       isMounted = false;
     };
   }, [id]);
 
   if (!id) return null;
+
+  if (error) {
+    return (
+      <div className={`${style.wraper}`}>
+        <div className={`${style.error}`}>Упс, кажется произошла ошибка</div>
+      </div>
+    );
+  }
+
   if (!data) {
     return (
       <div className={`${style.wraper}`}>
-        <div className={`${style.header}`}>
+        <div className={`${style.header} ${style.shimmeroverlay}`}>
           Загружаем информацию по вашему адресу
         </div>
       </div>
     );
   }
+
   return (
     <div className={`${style.wraper}`}>
       <div className={`${style.header}`}>
@@ -46,21 +64,29 @@ export default function PreferAddressLink() {
           const end = parseYmdHmsSmart(item.end);
           return (
             <div className={`${style.item}`} key={index}>
-              <p>{getBlackoutTypeLabel(item.type)}</p>
-              <p>
-                — {item.description} "{item.initiator_name}" приблизительно
-                закончится -{" "}
-                {end
-                  ? `${end.getDate()} ${getWordMonth(end.getMonth())} в ${end
-                      .getHours()
-                      .toString()
-                      .padStart(2, "0")}:${end
-                      .getMinutes()
-                      .toString()
-                      .padStart(2, "0")}`
-                  : "дата неизвестна"}
-                "
-              </p>
+              <img
+                src={`/${item.type}.svg`}
+                alt=""
+                className={`${style.imgtype}`}
+              />
+              <div className={`${style.textwrap}`}>
+                <h3>
+                  {getBlackoutTypeLabelNoEmoji(item.type)}
+                  {" до "}
+                  {end
+                    ? `${end.getDate()} ${getWordMonth(end.getMonth())} ${end
+                        .getHours()
+                        .toString()
+                        .padStart(2, "0")}:${end
+                        .getMinutes()
+                        .toString()
+                        .padStart(2, "0")}`
+                    : "дата неизвестна"}
+                </h3>
+                <p className={`${style.description}`}>
+                  — {item.description} "{item.initiator_name}"
+                </p>
+              </div>
             </div>
           );
         })}

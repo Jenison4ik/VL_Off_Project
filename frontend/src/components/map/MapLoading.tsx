@@ -5,7 +5,7 @@ const MapLoading = () => (
     <div className={`${style.textContainer}`}>
       <div className={style.loader}></div>
       <div className={`${style.lable}`}>
-        <p>Загрузка карты</p>
+        <p>Загружаем карту</p>
       </div>
     </div>
   </div>

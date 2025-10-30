@@ -2,7 +2,7 @@ import styles from "./page.module.scss";
 import YMap from "../components/map/YMap";
 import { MockInitializer } from "@/components/MockInitializer";
 import PreferAddressLink from "@/components/PreferAddsressLink";
-import Search from "@/components/Search";
+import MainHeader from "@/components/MainHeader";
 
 export async function generateMetadata() {
   return {
@@ -16,16 +16,8 @@ export async function generateMetadata() {
 export default async function Home() {
   return (
     <>
-      <header className={`${styles.header}`}>
-        <a href="/">Главная</a>
-        <h1 className={` ${styles.title}`}>
-          Коммунальные услуги во Владивостоке
-        </h1>
-        <MockInitializer>
-          <Search />
-        </MockInitializer>
-      </header>
-      <div className={`${styles.content}`}>
+      <MainHeader />
+      <div className={styles.content}>
         <MockInitializer>
           <PreferAddressLink />
           <YMap />

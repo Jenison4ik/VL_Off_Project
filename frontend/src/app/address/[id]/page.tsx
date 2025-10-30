@@ -6,6 +6,7 @@ import type { Metadata, ResolvingMetadata } from "next";
 import PrefereAddress from "@/components/PreferAddressBtn";
 import { getBlackoutTypeLabel } from "@/utils/blackoutTypes";
 import style from "@/app/address/[id]/page.module.scss";
+import AddressHeader from "@/components/AddressHeader";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -62,10 +63,11 @@ export default async function BlackoutPage({
     initMocksServer();
     const info = await getBlackoutsByID(id);
     return (
-      <div>
+      <>
+        <AddressHeader titleProp={info.address} id={id} />
         <div className={`${style.head}`}>
           <h1>{info.address}</h1>
-          <PrefereAddress id={id} />
+          {/* <PrefereAddress id={id} /> */}
         </div>
         {info.blackouts.map((el, i) => (
           <div key={i}>
@@ -73,7 +75,7 @@ export default async function BlackoutPage({
             <p>{el.description}</p>
           </div>
         ))}
-      </div>
+      </>
     );
   } catch (error: any) {
     if (error.message === "NOT_FOUND") {

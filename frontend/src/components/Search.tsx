@@ -20,7 +20,6 @@ function useSearch() {
     async function run() {
       const val = query.trim();
       const len = val.length;
-      console.log(lastRequestedLenRef.current, "   ", len);
       if (
         (!query || len < 3 || len % 3 !== 0) &&
         val[len - 1]?.toLowerCase() !== val[len - 1]?.toUpperCase() &&
@@ -138,6 +137,19 @@ export default function Search() {
 
   return (
     <div className={style.wraper}>
+      <button
+        className={`${style.searchbtn}`}
+        onClick={() => {
+          searchAddress(query.trim()).then((res) => {
+            if (res[0]) {
+              console.log(res);
+              router.push(`/address/${res[0].building_id}`);
+            }
+          });
+        }}
+      >
+        <img src={"/search.svg"} alt="Поиск" className={`${style.img}`} />
+      </button>
       <div ref={containerRef} className={style.searchContainer}>
         <input
           className={style.input}
@@ -179,19 +191,6 @@ export default function Search() {
           </div>
         )}
       </div>
-      <button
-        className={`${style.searchbtn}`}
-        onClick={() => {
-          searchAddress(query.trim()).then((res) => {
-            if (res[0]) {
-              console.log(res);
-              router.push(`/address/${res[0].building_id}`);
-            }
-          });
-        }}
-      >
-        Найти
-      </button>
     </div>
   );
 }

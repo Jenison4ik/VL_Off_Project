@@ -1,11 +1,8 @@
-"use server";
-import Image from "next/image";
-import styles from "./page.module.css";
+import styles from "./page.module.scss";
 import YMap from "../components/map/YMap";
 import { MockInitializer } from "@/components/MockInitializer";
 import PreferAddressLink from "@/components/PreferAddsressLink";
-import { initMocksServer } from "@/mocks/server";
-import Search from "@/components/Search";
+import MainHeader from "@/components/MainHeader";
 
 export async function generateMetadata() {
   return {
@@ -19,12 +16,13 @@ export async function generateMetadata() {
 export default async function Home() {
   return (
     <>
-      <h1 className={`${styles.title}`}>Отключения воды и света Владивосток</h1>
-      <MockInitializer>
-        <Search />
-        <PreferAddressLink />
-        <YMap />
-      </MockInitializer>
+      <MainHeader />
+      <div className={styles.content}>
+        <MockInitializer>
+          <PreferAddressLink />
+          <YMap />
+        </MockInitializer>
+      </div>
     </>
   );
 }

@@ -13,12 +13,20 @@ export const BLACKOUT_TYPE_LABELS: Record<BlackoutType, string> = {
   hot_water: "🔥💧 Отключение горячей воды",
   heat: "🔥 Отключение отопления",
 };
-
+export const BLACKOUT_TYPE_LABELS_NO_EMOJI: Record<BlackoutType, string> = {
+  electricity: "Отключение света",
+  cold_water: " Отключение холодной воды",
+  hot_water: "Отключение горячей воды",
+  heat: "Отключение отопления",
+};
 /**
  * Получить текстовое описание типа отключения
  */
 export function getBlackoutTypeLabel(type: string): string {
   return BLACKOUT_TYPE_LABELS[type as BlackoutType] || type;
+}
+export function getBlackoutTypeLabelNoEmoji(type: string): string {
+  return BLACKOUT_TYPE_LABELS_NO_EMOJI[type as BlackoutType] || type;
 }
 
 /**

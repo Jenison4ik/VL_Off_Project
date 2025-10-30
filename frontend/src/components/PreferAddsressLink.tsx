@@ -24,16 +24,25 @@ export default function PreferAddressLink() {
   }, [id]);
 
   if (!id) return null;
+  if (!data) {
+    return (
+      <div className={`${style.wraper}`}>
+        <div className={`${style.header}`}>
+          Загружаем информацию по вашему адресу
+        </div>
+      </div>
+    );
+  }
   return (
     <div className={`${style.wraper}`}>
       <div className={`${style.header}`}>
         Информация по адресу{" "}
         <a href={`/address/${id}`} className={`${style.link}`}>
-          {data?.address}
+          {data.address}
         </a>
       </div>
       <div className={`${style.dataBlock}`}>
-        {data?.blackouts.map((item, index) => {
+        {data.blackouts.map((item, index) => {
           const end = parseYmdHmsSmart(item.end);
           return (
             <div className={`${style.item}`} key={index}>

@@ -5,6 +5,7 @@ import { initMocksServer } from "@/mocks/server";
 import type { Metadata, ResolvingMetadata } from "next";
 import PrefereAddress from "@/components/PreferAddressBtn";
 import { getBlackoutTypeLabel } from "@/utils/blackoutTypes";
+import style from "@/app/address/[id]/page.module.scss";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -62,16 +63,16 @@ export default async function BlackoutPage({
     const info = await getBlackoutsByID(id);
     return (
       <div>
-        <h1>
-          <span className="address">{info.address}</span> Отключения
-        </h1>
+        <div className={`${style.head}`}>
+          <h1>{info.address}</h1>
+          <PrefereAddress id={id} />
+        </div>
         {info.blackouts.map((el, i) => (
           <div key={i}>
             <h3>{getBlackoutTypeLabel(el.type)}</h3>
             <p>{el.description}</p>
           </div>
         ))}
-        <PrefereAddress id={id} />
       </div>
     );
   } catch (error: any) {

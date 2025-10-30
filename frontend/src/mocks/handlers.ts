@@ -28,6 +28,7 @@ export const handlers = [
   }),
   http.get("http://localhost:3000/api/v1/blackouts/:id", async ({ params }) => {
     // Пример ответа согласно интерфейсу BlackoutByID
+    await delay(2000);
     const { id } = params;
     // if (id === "ba79551dde9ae08ce006390738ebf6b8") {
     return HttpResponse.json(blackoutByID);

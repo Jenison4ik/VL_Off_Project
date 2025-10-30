@@ -1,0 +1,33 @@
+.wraper {
+  width: 100%;
+  font-family: 16px;
+  height: fit-content;
+}
+.link {
+  // font-size: 1.5rem;
+  display: block;
+  padding: 5px 10px;
+  background-color: #d0d0d0;
+  width: fit-content;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+}
+.dataBlock {
+  width: 100%;
+}
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 1.3rem;
+}
+@media screen and (max-width: 768px) {
+  .header {
+    justify-content: center;
+  }
+}

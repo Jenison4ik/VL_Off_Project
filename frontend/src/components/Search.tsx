@@ -117,46 +117,61 @@ export default function Search() {
   }
 
   return (
-    <div ref={containerRef} className={style.searchContainer}>
-      <input
-        className={style.input}
-        type="text"
-        placeholder="Поиск по адресу"
-        value={query}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          if (!isOpen) setIsOpen(true);
-        }}
-        onFocus={() => setIsOpen(true)}
-        onKeyDown={onKeyDown}
-      />
+    <div className={style.wraper}>
+      <div ref={containerRef} className={style.searchContainer}>
+        <input
+          className={style.input}
+          type="text"
+          placeholder="Поиск по адресу"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            if (!isOpen) setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+          onKeyDown={onKeyDown}
+        />
 
-      {isOpen && (
-        <div className={style.dropdown}>
-          {isLoading && <div className={style.loading}>Загрузка…</div>}
-          {!isLoading && results.length === 0 && query.trim().length >= 3 && (
-            <div className={style.empty}>Ничего не найдено</div>
-          )}
-          {!isLoading &&
-            results.map((item, idx) => (
-              <div
-                key={item.building_id + idx}
-                className={
-                  idx === activeIndex
-                    ? `${style.item} ${style.itemActive}`
-                    : style.item
-                }
-                onMouseEnter={() => setActiveIndex(idx)}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  onPick(idx);
-                }}
-              >
-                {item.full_address}
-              </div>
-            ))}
-        </div>
-      )}
+        {isOpen && (
+          <div className={style.dropdown}>
+            {isLoading && <div className={style.loading}>Загрузка…</div>}
+            {!isLoading && results.length === 0 && query.trim().length >= 3 && (
+              <div className={style.empty}>Ничего не найдено</div>
+            )}
+            {!isLoading &&
+              results.map((item, idx) => (
+                <div
+                  key={item.building_id + idx}
+                  className={
+                    idx === activeIndex
+                      ? `${style.item} ${style.itemActive}`
+                      : style.item
+                  }
+                  onMouseEnter={() => setActiveIndex(idx)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    onPick(idx);
+                  }}
+                >
+                  {item.full_address}
+                </div>
+              ))}
+          </div>
+        )}
+      </div>
+      <button
+        className={`${style.searchbtn}`}
+        onClick={() => {
+          searchAddress(query.trim()).then((res) => {
+            if (res[0]) {
+              console.log(res);
+              router.push(`/address/${res[0].building_id}`);
+            }
+          });
+        }}
+      >
+        Найти
+      </button>
     </div>
   );
 }

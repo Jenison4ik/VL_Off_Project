@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { mixColors } from "@/utils/colorUtils";
+import { getBlackoutTypeLabel } from "@/utils/blackoutTypes";
 import type { BlackoutByBuilding } from "@/types/Blackout";
 import style from "@/components/map/BlackoutMarker.module.css";
 /**
@@ -44,14 +45,6 @@ export default function BlackoutMarker({
     heat: "#c20000",
   };
 
-  /** Заголовки для popup'а по типам */
-  const typesText = new Map([
-    ["electricity", "⚡ Отключение света"],
-    ["cold_water", "❄️💧 Отключение холодной воды"],
-    ["hot_water", "🔥💧 Отключение горячей воды"],
-    ["heat", "🔥 Отключение отопления"],
-  ]);
-
   /**
    * Мемоизированный расчет данных для popup'а:
    * - смешанный цвет маркера
@@ -67,7 +60,7 @@ export default function BlackoutMarker({
 
       // JSX для заголовков по типам
       const blackoutTypeElements = uniqueTypes.map((type, index) => (
-        <strong key={type}>{typesText.get(type)}</strong>
+        <strong key={type}>{getBlackoutTypeLabel(type)}</strong>
       ));
 
       // Смешиваем цвета всех типов

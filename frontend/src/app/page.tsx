@@ -19,11 +19,11 @@ export async function generateMetadata() {
 export default async function Home() {
   return (
     <>
-      <h1>Отключения воды и света Владивосток</h1>
+      <h1 className={`${styles.title}`}>Отключения воды и света Владивосток</h1>
       <MockInitializer>
         <Search />
-        <YMap />
         <PreferAddressLink />
+        <YMap />
       </MockInitializer>
     </>
   );

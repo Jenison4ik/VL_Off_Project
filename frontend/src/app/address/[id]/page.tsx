@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { initMocksServer } from "@/mocks/server";
 import type { Metadata, ResolvingMetadata } from "next";
 import PrefereAddress from "@/components/PreferAddressBtn";
+import { getBlackoutTypeLabel } from "@/utils/blackoutTypes";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -21,15 +22,8 @@ export async function generateMetadata(
     const info = await getBlackoutsByID(id);
 
     // Создаем описание на основе типов отключений
-    const typesText = new Map([
-      ["electricity", "⚡ Отключение света"],
-      ["cold_water", "❄️💧 Отключение холодной воды"],
-      ["hot_water", "🔥💧 Отключение горячей воды"],
-      ["heat", "🔥 Отключение отопления"],
-    ]);
-
     const blackoutTypes = info.blackouts
-      .map((blackout) => typesText.get(blackout.type) || blackout.type)
+      .map((blackout) => getBlackoutTypeLabel(blackout.type))
       .join(", ");
 
     const description = `Отключения по адресу ${info.address}: ${blackoutTypes}. ${info.blackouts.length} отключений запланировано.`;
@@ -66,12 +60,6 @@ export default async function BlackoutPage({
   try {
     initMocksServer();
     const info = await getBlackoutsByID(id);
-    const typesText = new Map([
-      ["electricity", "⚡ Отключение света"],
-      ["cold_water", "❄️💧 Отключение холодной воды"],
-      ["hot_water", "🔥💧 Отключение горячей воды"],
-      ["heat", "🔥 Отключение отопления"],
-    ]);
     return (
       <div>
         <h1>
@@ -79,7 +67,7 @@ export default async function BlackoutPage({
         </h1>
         {info.blackouts.map((el, i) => (
           <div key={i}>
-            <h3>{typesText.get(el.type)}</h3>
+            <h3>{getBlackoutTypeLabel(el.type)}</h3>
             <p>{el.description}</p>
           </div>
         ))}

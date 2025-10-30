@@ -159,7 +159,10 @@ a.secondary {
     justify-content: center;
   }
 }
-
+.title {
+  text-align: center;
+  width: 100%;
+}
 @media (prefers-color-scheme: dark) {
   .logo {
     filter: invert();

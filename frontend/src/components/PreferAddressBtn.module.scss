@@ -21,6 +21,10 @@
   -ms-transition: background-color 0.2s ease-out;
   -o-transition: background-color 0.2s ease-out;
 }
+.btn:disabled {
+  color: #6b6b6b;
+  background-color: #d1d1d1;
+}
 @media (hover: hover) and (pointer: fine) {
   //Чтобы небыло залипаний на мобилках
   .btn:hover {

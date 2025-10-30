@@ -5,7 +5,12 @@ import style from "@/components/PreferAddressBtn.module.scss";
 export default function PrefereAddress({ id }: { id: string }) {
   const { isFavorite, toggleFavorite } = useFavoriteId(id);
 
-  if (isFavorite === null) return <button disabled={true}>Загрузка</button>;
+  if (isFavorite === null)
+    return (
+      <button disabled={true} className={`${style.btn}`}>
+        Загрузка
+      </button>
+    );
 
   return (
     <button onClick={toggleFavorite} className={`${style.btn}`}>

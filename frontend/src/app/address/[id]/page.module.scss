@@ -41,15 +41,12 @@
 .item {
   display: flex;
   align-items: center;
-  background: #d0d0d0;
+  background: #f4f4f4;
 
   padding: 12px;
   border-radius: 10px;
   transition: background 0.2s ease;
   color: #000;
-  &:hover {
-    background: #919191;
-  }
 }
 
 .imgtype {

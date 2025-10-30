@@ -1,0 +1,28 @@
+.btn {
+  font-size: 1rem;
+  gap: 10px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  outline: none;
+  border: none;
+  background-color: #666666;
+  border-radius: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  transition: background-color 0.2s ease-out;
+  -webkit-transition: background-color 0.2s ease-out;
+  -moz-transition: background-color 0.2s ease-out;
+  -ms-transition: background-color 0.2s ease-out;
+  -o-transition: background-color 0.2s ease-out;
+}
+@media (hover: hover) and (pointer: fine) {
+  //Чтобы небыло залипаний на мобилках
+  .btn:hover {
+    background: rgb(130, 130, 130);
+    cursor: pointer;
+  }
+}

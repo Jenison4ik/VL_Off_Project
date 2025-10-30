@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Manrope, Geist_Mono } from "next/font/google";
 import "./globals.scss";
-import { initMocksServer } from "@/mocks/server";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const geistSans = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
 });
 
@@ -26,10 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <header>
-          <a href="/">Главная</a>
-        </header>
-        <div className="content">{children}</div>
+        {children}
       </body>
     </html>
   );

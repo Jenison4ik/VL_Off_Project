@@ -1,0 +1,29 @@
+.bird {
+  width: 50%;
+  height: auto;
+  max-width: 440px;
+}
+.content {
+  width: 90vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  h1 {
+    color: #f17e49;
+    font-size: 100px;
+  }
+  a {
+    display: block;
+    color: #fff;
+    background: #f17e49;
+    padding: 10px;
+    border-radius: 10px;
+  }
+}

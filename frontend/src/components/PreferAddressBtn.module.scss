@@ -1,14 +1,16 @@
 .btn {
   font-size: 1rem;
   gap: 10px;
-  color: #fff;
+  color: #000000;
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 10px;
   outline: none;
   border: none;
-  background-color: #666666;
-  border-radius: 10px;
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 50px;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   -ms-border-radius: 10px;
@@ -22,7 +24,7 @@
 @media (hover: hover) and (pointer: fine) {
   //Чтобы небыло залипаний на мобилках
   .btn:hover {
-    background: rgb(130, 130, 130);
+    background: #cfcfcf;
     cursor: pointer;
   }
 }

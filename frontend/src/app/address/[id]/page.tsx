@@ -1,10 +1,11 @@
 "use server";
+
 import getBlackoutsByID from "@/services/getBlackoutsByID";
 import { notFound } from "next/navigation";
 import { initMocksServer } from "@/mocks/server";
 import type { Metadata, ResolvingMetadata } from "next";
-import PrefereAddress from "@/components/PreferAddressBtn";
-import { getBlackoutTypeLabel } from "@/utils/blackoutTypes";
+import { getBlackoutTypeLabelNoEmoji } from "@/utils/blackoutTypes";
+import { getWordMonth, parseYmdHmsSmart } from "@/utils/date";
 import style from "@/app/address/[id]/page.module.scss";
 import AddressHeader from "@/components/AddressHeader";
 
@@ -14,7 +15,7 @@ type Props = {
 };
 
 export async function generateMetadata(
-  { params, searchParams }: Props,
+  { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { id } = await params;
@@ -23,29 +24,27 @@ export async function generateMetadata(
     initMocksServer();
     const info = await getBlackoutsByID(id);
 
-    // Создаем описание на основе типов отключений
     const blackoutTypes = info.blackouts
-      .map((blackout) => getBlackoutTypeLabel(blackout.type))
+      .map((blackout) => getBlackoutTypeLabelNoEmoji(blackout.type))
       .join(", ");
 
     const description = `Отключения по адресу ${info.address}: ${blackoutTypes}. ${info.blackouts.length} отключений запланировано.`;
 
     return {
       title: `Отключения — ${info.address}`,
-      description: description,
+      description,
       openGraph: {
         title: `Отключения — ${info.address}`,
-        description: description,
+        description,
         type: "website",
       },
       twitter: {
         card: "summary",
         title: `Отключения — ${info.address}`,
-        description: description,
+        description,
       },
     };
-  } catch (error) {
-    // Если данные не найдены, возвращаем базовые метаданные
+  } catch {
     return {
       title: "Отключения — Адрес не найден",
       description: "Информация об отключениях по данному адресу не найдена",
@@ -59,28 +58,57 @@ export default async function BlackoutPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
   try {
     initMocksServer();
     const info = await getBlackoutsByID(id);
+    const hasBlackouts = info.blackouts.length > 0;
+
     return (
       <>
         <AddressHeader titleProp={info.address} id={id} />
-        <div className={`${style.head}`}>
-          <h1>{info.address}</h1>
-          {/* <PrefereAddress id={id} /> */}
+        <div className={style.content}></div>
+        <div className={style.dataBlock}>
+          {!hasBlackouts ? (
+            <div className={style.noData}>Отключений не было</div>
+          ) : (
+            info.blackouts.map((item, index) => {
+              const end = parseYmdHmsSmart(item.end);
+              const formattedEnd = end
+                ? `${end.getDate()} ${getWordMonth(end.getMonth())} ${end
+                    .getHours()
+                    .toString()
+                    .padStart(2, "0")}:${end
+                    .getMinutes()
+                    .toString()
+                    .padStart(2, "0")}`
+                : "дата неизвестна";
+
+              return (
+                <div className={style.item} key={index}>
+                  <img
+                    src={`/${item.type}.svg`}
+                    alt=""
+                    className={style.imgtype}
+                  />
+                  <div className={style.textwrap}>
+                    <h3>
+                      {getBlackoutTypeLabelNoEmoji(item.type)} {"до "}
+                      {formattedEnd}
+                    </h3>
+                    <p className={style.description}>
+                      — {item.description} "{item.initiator_name}"
+                    </p>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
-        {info.blackouts.map((el, i) => (
-          <div key={i}>
-            <h3>{getBlackoutTypeLabel(el.type)}</h3>
-            <p>{el.description}</p>
-          </div>
-        ))}
       </>
     );
   } catch (error: any) {
-    if (error.message === "NOT_FOUND") {
-      notFound();
-    }
-    throw error; // для других ошибок ― пробрасываем дальше
+    if (error.message === "NOT_FOUND") notFound();
+    throw error;
   }
 }

@@ -26,6 +26,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
+        <footer>
+          <div className="foot-wrap">
+            © это студ проект и он не имеет отношения к vl.ru Он создан в
+            рамках Проектной школы Фарпост, 2025. Все размещённые данные
+            являются учебными и не содержат достоверной информации. При
+            использовании материалов ссылка на источник обязательна.
+          </div>
+        </footer>
       </body>
     </html>
   );

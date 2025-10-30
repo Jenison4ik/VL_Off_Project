@@ -39,7 +39,7 @@
 
 ## 🔄 Архитектура взаимодействия
 
-📎 [Визуализация архитектуры (Google Drive)](https://drive.google.com/file/d/17YdZDHXptjGAwLRFEqfNRlobUneIhiCL/view?usp=sharing)
+📎 [Визуализация архитектуры (Google Drive)](https://drive.google.com/file/d/1f9imtgWe26sqSA_v5F0euhay1ppuZM4s/view?usp=sharing)
 
 
 ---

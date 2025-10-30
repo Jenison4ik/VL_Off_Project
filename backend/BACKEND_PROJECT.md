@@ -91,7 +91,7 @@ app/
 
 ### 3.2. Архитектурная схема взаимодействия
 
-## [ссылка на визуализацию структуры функционирования проекта](https://drive.google.com/file/d/17YdZDHXptjGAwLRFEqfNRlobUneIhiCL/view?usp=sharing)
+## [ссылка на визуализацию структуры функционирования проекта](https://drive.google.com/file/d/1f9imtgWe26sqSA_v5F0euhay1ppuZM4s/view?usp=sharing)
 
 ### 3.3. Автодокументация `Swagger UI` доступна по роуту **http://127.0.0.1:8000/docs**, при запущеном приложении fastapi
 

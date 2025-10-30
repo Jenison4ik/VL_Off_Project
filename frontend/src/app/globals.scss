@@ -54,6 +54,14 @@ footer {
   justify-content: center;
   min-width: 100vw;
 }
+.contenttop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  justify-content: flex-start;
+}
 .foot-wrap {
   width: 60vw;
 }

@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+        <div className="contenttop">{children}</div>
         <footer>
           <div className="foot-wrap">
             © это студ проект и он не имеет отношения к vl.ru Он создан в

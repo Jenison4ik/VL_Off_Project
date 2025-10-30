@@ -4,15 +4,12 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
-    container_name: next_frontend_dev
+      dockerfile: Dockerfile
+    container_name: next_frontend
     environment:
-      - NODE_ENV=development
-    ports:
-      - "3000:3000" # доступ с хоста
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules # чтобы node_modules оставались внутри контейнера
+      - NODE_ENV=production
+    expose:
+      - "3000"
     networks:
       - app_network
     restart: unless-stopped

@@ -1,4 +1,29 @@
-# Базовый образ Node.js
+# # 🔹 DEV Dockerfile для Next.js
+# FROM node:18-alpine
+
+# RUN apk add --no-cache libc6-compat
+
+# WORKDIR /app
+
+# COPY package.json package-lock.json* ./
+# RUN npm ci
+
+# COPY . .
+
+# EXPOSE 3000
+
+# # ENV NODE_ENV=production
+
+# # 🔹 Запуск dev-сервера с hot reload
+# # CMD ["npm", "run", "dev"]
+
+# RUN npm run build
+
+# CMD ["npm","run","start"]
+
+
+
+
 FROM node:18-alpine
 
 RUN apk add --no-cache libc6-compat
@@ -6,14 +31,17 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-
 RUN npm ci
 
-# Копируем код для dev
 COPY . .
 
-# Порт для dev
+# Задаём переменную окружения для production
+ENV NODE_ENV=production
+
+# Собираем Next.js (это уже билд как в прод)
+RUN npm run build
+
 EXPOSE 3000
 
-# Запуск dev-сервера
-CMD ["npm", "run", "dev"]
+# Запуск production-сервера
+CMD ["npm", "run", "start"]

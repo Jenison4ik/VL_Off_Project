@@ -1,11 +1,11 @@
 # [🌐 VL.RU OFF](https://jenison.ru/) — обновлённый сервис отключений Владивостока
 
 ## Наша команда:
-Соловьев Евгений [@zhekich_solovev](https://t.me/zhekich_solovev) - Frontend Developer
-Мамонтов Михаил [@mmmontov](https://t.me/mmmontov) - Backend Developer
-Величко София [@sofleee](https://t.me/sofleee) - Дизайнер
-Завадский Максим [@revolxn](https://t.me/revolxn) - Аналитик данных
-Барилов Василий [@NightVas](https://t.me/NightVas) - Product Manager
+- Соловьев Евгений [@zhekich_solovev](https://t.me/zhekich_solovev) - Frontend Developer
+- Мамонтов Михаил [@mmmontov](https://t.me/mmmontov) - Backend Developer
+- Величко София [@sofleee](https://t.me/sofleee) - Дизайнер
+- Завадский Максим [@revolxn](https://t.me/revolxn) - Аналитик данных
+- Барилов Василий [@NightVas](https://t.me/NightVas) - Product Manager
 
 ## 🏆Результат
 По итогам "Проектной школы", данный проект занял 5 место из 12 в общем зачёте и лучший Frontend среди всех

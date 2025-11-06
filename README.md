@@ -134,6 +134,9 @@ docker-compose up --build
   в папке `./backend/app` рядом с `blackouts_database_put_here.lock`.  
   [Скачать базу данных](https://drive.google.com/file/d/193MPUIhWy5sL5yQk7nRSev-IcMimn1bD/view?usp=sharing)
 
+- **Все документы с аналитикой** доступны по ссылке
+  👉[https://drive.google.com/drive/folders/1N7p3im_A7fy_p8x8oYJiDyIwTabf4f7O?usp=sharing]
+
 - **Swagger UI** доступен по адресу  
   👉 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)  
   при запущенном FastAPI-приложении.

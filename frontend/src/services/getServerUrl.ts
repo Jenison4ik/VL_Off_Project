@@ -4,7 +4,12 @@ export default function getServerUrl() {
   let baseUrl = "";
 
   if (isServer) {
-    if (process.env.NODE_ENV === "development") {
+    // Внутри Docker контейнера используем внутренний адрес nginx
+    // Если INTERNAL_API_URL установлена, используем её (для Docker)
+    const internalApiUrl = process.env.INTERNAL_API_URL;
+    if (internalApiUrl) {
+      baseUrl = internalApiUrl;
+    } else if (process.env.NODE_ENV === "development") {
       baseUrl = "localhost:3000";
     } else {
       baseUrl = process.env.NEXT_PUBLIC_HOST_NAME as string;

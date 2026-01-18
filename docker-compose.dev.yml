@@ -9,6 +9,7 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_HOST_NAME=localhost:8080
+      - INTERNAL_API_URL=nginx:80
     expose:
       - "3000"
     networks:
